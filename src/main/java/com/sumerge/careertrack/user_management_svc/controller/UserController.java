@@ -44,13 +44,13 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
     @GetMapping("/user")
-    public ResponseEntity<UserDTO> getUserByEmail(@RequestBody string email){
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestBody String email){
         UserDTO user =  userService.getUserByEmail(email);
         return ResponseEntity.ok(user);
     }
     @GetMapping("/")
-    public ResponseEntity<List<UserDTO>> getUsersByDep(@RequestBody UUID depId){
-        List<UserDTO> user =  userService.getUsersByDep(depId);
+    public ResponseEntity<List<UserDTO>> getUsersByDep(@RequestBody String departmentName){
+        List<UserDTO> user =  userService.getUsersByDep(departmentName);
         return ResponseEntity.ok(user);
     }
     @GetMapping("/")
@@ -59,7 +59,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
     @GetMapping("/")
-    public ResponseEntity<List<UserDTO>> getUsersByTite(@RequestBody string title){
+    public ResponseEntity<List<UserDTO>> getUsersByTite(@RequestBody String title){
         List<UserDTO> user =  userService.getUsersByTite(title);
         return ResponseEntity.ok(user);
     }
@@ -78,18 +78,19 @@ public class UserController {
     }
 
     /* UPDATE METHODS */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/user/updateUser")
     public ResponseEntity<UserDTO> updateUser(@RequestBody UUID userId,UserDTO updatedDTO){
         UserDTO updatedUser= userService.updateUser(userId,updatedDTO);
         return ResponseEntity.ok(updatedUser);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/user/promoteUser")
-    public ResponseEntity<UserDTO> promoteUser(@RequestBody UUID userId,string title){
-        UserDTO updatedUser= userService.promoteUser(userId,title);
-        return ResponseEntity.ok(updatedUser);
-    }
+    // @PreAuthorize("hasRole('ADMIN')")
+    // @PutMapping("/user/promoteUser")
+    // public ResponseEntity<UserDTO> promoteUser(@RequestBody UUID userId,String title){
+    //     UserDTO updatedUser= userService.promoteUser(userId,title);
+    //     return ResponseEntity.ok(updatedUser);
+    // }
 
     // @PreAuthorize("hasRole('ADMIN')")
     // @PutMapping("/user/changeManager")

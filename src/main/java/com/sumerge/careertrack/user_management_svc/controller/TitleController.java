@@ -12,52 +12,54 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sumerge.careertrack.user_management_svc.service.TitleService;
+
 @RestController
 @RequestMapping("/titles")
-public class TitlesController {
+public class TitleController {
     
     @Autowired
-    private TitlesService titlesService;
+    private TitleService titleService;
 
-    public TitlesController(TitlesService titlesService) {
-        this.titlesService = titlesService;
+    public TitleController(TitleService titleService) {
+        this.titleService = titleService;
     }
 
     /* Get Mappings */
     @GetMapping("/")
-    public ResponseEntity<List<TitlesDTO>> getAllTitles() {
-        List<TitlesDTO> titles = titlesService.findAllTitles();
+    public ResponseEntity<List<TitleDTO>> getAllTitles() {
+        List<TitleDTO> titles = titleService.findAlltitle();
         return ResponseEntity.ok(titles);
     }
     @GetMapping("/department")
-    public ResponseEntity<List<TitlesDTO>> getTitlesByDep(UUID depId) {
-        List<TitlesDTO> titles = titlesService.findTitlesByDep(depId);
+    public ResponseEntity<List<TitleDTO>> getTitlesByDep(UUID depId) {
+        List<TitleDTO> titles = titleService.findtitleByDep(depId);
         return ResponseEntity.ok(titles);
     }
     @GetMapping("/manager")
-    public ResponseEntity<List<TitlesDTO>> getManagerTitles() {
-        List<TitlesDTO> titles = titlesService.findManagerTitles();
+    public ResponseEntity<List<TitleDTO>> getManagerTitles() {
+        List<TitleDTO> titles = titleService.findManagertitle();
         return ResponseEntity.ok(titles);
     }
 
     /* Post Mappings */
     @PostMapping("/")
-    public ResponseEntity<TitlesDTO> addTitle(TitlesDTO title) {
-        TitlesDTO newTitle = titlesService.addTitle(title);
+    public ResponseEntity<TitleDTO> addTitle(TitleDTO title) {
+        TitleDTO newTitle = titleService.addTitle(title);
         return ResponseEntity.ok(newTitle);
     }
 
     /* Put Mappings */
     @PutMapping("/")
-    public ResponseEntity<TitlesDTO> transferTitleDep(TitlesDTO title, UUID depId) {
-        TitlesDTO newTitle = titlesService.transferTitleDep(title, depId);
+    public ResponseEntity<TitleDTO> transferTitleDep(TitleDTO title, UUID depId) {
+        TitleDTO newTitle = titleService.transferTitleDep(title, depId);
         return ResponseEntity.ok(newTitle);
     }
 
     /* Delete Mappings */
     @DeleteMapping("/")
     public void deleteTitle(UUID titleId) {
-        titlesService.deleteTitle(titleId);
+        titleService.deleteTitle(titleId);
     }
     
 
