@@ -17,7 +17,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, UUID> {
 
     Optional<AppUser> findByEmail(String email);
 
-    List<AppUser> findByTitle(String titleName);
+    List<AppUser> findByTitleIdName(String titleName);
 
     List<AppUser> findAllByTitleId(TitleId deptAndTitle);
 

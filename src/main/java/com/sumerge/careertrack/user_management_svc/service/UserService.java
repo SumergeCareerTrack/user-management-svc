@@ -48,7 +48,7 @@ public class UserService {
     }
 
     public List<AppUserDTO> getManagersByDept(String deptName) {
-        List<Title> titles = titlesRepository.findByDepartment(deptName);
+        List<Title> titles = titlesRepository.findByIdDepartment(deptName);
         List<AppUser> managers = titles.stream()
                 .filter(title -> title.isManager())
                 .flatMap(title -> userRepository.findAllByTitleId(title.getId()).stream())
@@ -66,7 +66,7 @@ public class UserService {
     }
 
     public List<AppUserDTO> getAllByTitle(String titleName) {
-        List<AppUser> users = userRepository.findByTitle(titleName);
+        List<AppUser> users = userRepository.findByTitleIdName(titleName);
         return users.stream().map(userMapper::toDTO).collect(Collectors.toList());
     }
 

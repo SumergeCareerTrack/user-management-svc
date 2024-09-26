@@ -10,7 +10,8 @@ import com.sumerge.careertrack.user_management_svc.entities.compositeKeys.TitleI
 
 @Repository
 public interface TitleRepository extends JpaRepository<Title, TitleId> {
-    List<Title> findByDepartment(String deptName);
+    List<Title> findByIdDepartment(String deptName);
 
-    boolean existsByDepartmentAndName(String deptName, String titleName);
+    boolean existsById(TitleId id);
+    // boolean existsByDepartmentAndName(String deptName, String titleName);
 }

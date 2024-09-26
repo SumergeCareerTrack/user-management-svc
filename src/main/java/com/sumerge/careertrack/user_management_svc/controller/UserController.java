@@ -33,15 +33,15 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/") // TODO Review RequestBody vs PathVariable
-    public ResponseEntity<AppUserDTO> getByEmail(@RequestBody String email) {
+    @GetMapping("/{email}") // TODO Review RequestBody vs PathVariable
+    public ResponseEntity<AppUserDTO> getByEmail(@PathVariable String email) {
         AppUserDTO user = userService.getByEmail(email);
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<AppUserDTO>> getAllByTitle(@RequestBody String title) {
-        List<AppUserDTO> users = userService.getAllByTitle(title);
+    @GetMapping("/{titleName}")
+    public ResponseEntity<List<AppUserDTO>> getAllByTitle(@PathVariable String titleName) {
+        List<AppUserDTO> users = userService.getAllByTitle(titleName);
         return ResponseEntity.ok(users);
     }
 

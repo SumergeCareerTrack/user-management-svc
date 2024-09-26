@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.sumerge.careertrack.user_management_svc.entities.Title;
 import com.sumerge.careertrack.user_management_svc.entities.compositeKeys.TitleId;
@@ -12,6 +13,7 @@ import com.sumerge.careertrack.user_management_svc.mappers.TitleDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleMapper;
 import com.sumerge.careertrack.user_management_svc.repositories.TitleRepository;
 
+@Service
 public class TitleService {
 
     @Autowired
@@ -26,14 +28,14 @@ public class TitleService {
     }
 
     public List<TitleDTO> findByDept(String departmentName) {
-        List<Title> titles = titleRepository.findByDepartment(departmentName);
+        List<Title> titles = titleRepository.findByIdDepartment(departmentName);
         return titles.stream().map(titleMapper::toDTO).collect(Collectors.toList());
     }
 
     public TitleDTO createTitle(TitleDTO titleDTO) {
         Title title = titleMapper.toTitle(titleDTO);
         boolean titleExists = titleRepository
-                .existsByDepartmentAndName(titleDTO.getDepartmentName(), titleDTO.getTitleName());
+                .existsById(new TitleId(titleDTO.getDepartmentName(), titleDTO.getTitleName()));
         if (titleExists) {
             throw new RuntimeException("Title already exists");
         }

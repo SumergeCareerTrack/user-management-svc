@@ -7,7 +7,7 @@ import org.mapstruct.Named;
 import com.sumerge.careertrack.user_management_svc.entities.Title;
 import com.sumerge.careertrack.user_management_svc.entities.compositeKeys.TitleId;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface TitleMapper {
 
     @Mapping(target = "id", source = "titleDTO", qualifiedByName = "namesToTitleId")
