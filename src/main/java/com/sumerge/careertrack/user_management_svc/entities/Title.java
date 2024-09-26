@@ -18,6 +18,7 @@ public class Title {
 
     public Title(String department, String title) {
         this.id = new TitleId(department, title);
+        this.isManager = false;
     }
 
     public Title(String department, String title, boolean isManager) {
