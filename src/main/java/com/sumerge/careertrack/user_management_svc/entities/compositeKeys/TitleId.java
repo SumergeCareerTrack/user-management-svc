@@ -10,6 +10,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class TitleId implements Serializable {
-    private String departmentId;
-    private String title;
+    private String department;
+    private String name;
 }

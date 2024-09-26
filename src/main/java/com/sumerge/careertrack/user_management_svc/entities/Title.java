@@ -4,8 +4,6 @@ import com.sumerge.careertrack.user_management_svc.entities.compositeKeys.TitleI
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,16 +16,11 @@ public class Title {
 
     private boolean isManager;
 
-    @ManyToOne
-    @MapsId("departmentId")
-    private Department department;
-
-    public Title(Department department, String title) {
-        this.id = new TitleId(department.getName(), title);
-        this.department = department;
+    public Title(String department, String title) {
+        this.id = new TitleId(department, title);
     }
 
-    public Title(Department department, String title, boolean isManager) {
+    public Title(String department, String title, boolean isManager) {
         this(department, title);
         this.isManager = isManager;
     }
