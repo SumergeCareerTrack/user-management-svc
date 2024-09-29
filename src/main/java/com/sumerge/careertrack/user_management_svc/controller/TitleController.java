@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.sumerge.careertrack.user_management_svc.mappers.TitleDTO;
+import com.sumerge.careertrack.user_management_svc.mappers.TitleRequestDTO;
+import com.sumerge.careertrack.user_management_svc.mappers.TitleResponseDTO;
 import com.sumerge.careertrack.user_management_svc.service.TitleService;
 
 @RestController
@@ -24,27 +25,27 @@ public class TitleController {
 
     /* Get Mappings */
     @GetMapping("/")
-    public ResponseEntity<List<TitleDTO>> getAll() {
-        List<TitleDTO> titles = titleService.getAll();
+    public ResponseEntity<List<TitleResponseDTO>> getAll() {
+        List<TitleResponseDTO> titles = titleService.getAll();
         return ResponseEntity.ok(titles);
     }
 
     @GetMapping("/{deptName}")
-    public ResponseEntity<List<TitleDTO>> getAllByDept(String deptName) {
-        List<TitleDTO> titles = titleService.findByDept(deptName);
+    public ResponseEntity<List<TitleResponseDTO>> getAllByDept(String deptName) {
+        List<TitleResponseDTO> titles = titleService.findByDept(deptName);
         return ResponseEntity.ok(titles);
     }
 
     @GetMapping("/{deptName}/{titleName}")
-    public TitleDTO getById(@PathVariable String deptName, @PathVariable String titleName) {
-        TitleDTO title = titleService.getById(deptName, titleName);
+    public TitleResponseDTO getById(@PathVariable String deptName, @PathVariable String titleName) {
+        TitleResponseDTO title = titleService.getById(deptName, titleName);
         return title;
     }
 
     /* Post Mappings */
     @PostMapping("/")
-    public ResponseEntity<TitleDTO> createTitle(@RequestBody TitleDTO title) {
-        TitleDTO newTitle = titleService.createTitle(title);
+    public ResponseEntity<TitleResponseDTO> createTitle(@RequestBody TitleRequestDTO title) {
+        TitleResponseDTO newTitle = titleService.createTitle(title);
         return ResponseEntity.ok(newTitle);
     }
 
