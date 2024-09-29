@@ -32,6 +32,7 @@ public class UserController {
         List<AppUserDTO> users = userService.getAll();
         return ResponseEntity.ok(users);
     }
+    
 
     @GetMapping("/{email}") // TODO Review RequestBody vs PathVariable
     public ResponseEntity<AppUserDTO> getByEmail(@PathVariable String email) {
