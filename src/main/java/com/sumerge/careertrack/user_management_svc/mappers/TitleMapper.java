@@ -11,7 +11,7 @@ import com.sumerge.careertrack.user_management_svc.entities.compositeKeys.TitleI
 public interface TitleMapper {
 
     @Mapping(target = "id", source = "titleDTO", qualifiedByName = "namesToTitleId")
-    @Mapping(target = "manager", ignore = true)
+    @Mapping(target = "isManager", ignore = true)
     Title toTitle(TitleRequestDTO titleDTO);
 
     @Mapping(target = "departmentName", source = "id.department")
