@@ -9,7 +9,8 @@ import org.springframework.stereotype.Service;
 import com.sumerge.careertrack.user_management_svc.entities.Title;
 import com.sumerge.careertrack.user_management_svc.entities.compositeKeys.TitleId;
 import com.sumerge.careertrack.user_management_svc.exceptions.TitleDoesNotExistException;
-import com.sumerge.careertrack.user_management_svc.mappers.TitleDTO;
+import com.sumerge.careertrack.user_management_svc.mappers.TitleRequestDTO;
+import com.sumerge.careertrack.user_management_svc.mappers.TitleResponseDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleMapper;
 import com.sumerge.careertrack.user_management_svc.repositories.TitleRepository;
 
@@ -22,17 +23,17 @@ public class TitleService {
     @Autowired
     TitleMapper titleMapper;
 
-    public List<TitleDTO> getAll() {
+    public List<TitleResponseDTO> getAll() {
         List<Title> titles = titleRepository.findAll();
         return titles.stream().map(titleMapper::toDTO).collect(Collectors.toList());
     }
 
-    public List<TitleDTO> findByDept(String departmentName) {
+    public List<TitleResponseDTO> findByDept(String departmentName) {
         List<Title> titles = titleRepository.findByIdDepartment(departmentName);
         return titles.stream().map(titleMapper::toDTO).collect(Collectors.toList());
     }
 
-    public TitleDTO createTitle(TitleDTO titleDTO) {
+    public TitleResponseDTO createTitle(TitleRequestDTO titleDTO) {
         Title title = titleMapper.toTitle(titleDTO);
         boolean titleExists = titleRepository
                 .existsById(new TitleId(titleDTO.getDepartmentName(), titleDTO.getTitleName()));
@@ -44,7 +45,7 @@ public class TitleService {
         return titleMapper.toDTO(newTitle);
     }
 
-    public TitleDTO getById(String deptName, String titleName) {
+    public TitleResponseDTO getById(String deptName, String titleName) {
         TitleId id = new TitleId(deptName, titleName);
         Title title = titleRepository.findById(id)
                 .orElseThrow(() -> new TitleDoesNotExistException("Title not found"));
