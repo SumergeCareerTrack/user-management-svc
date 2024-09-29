@@ -5,11 +5,13 @@ import com.sumerge.careertrack.user_management_svc.entities.compositeKeys.TitleI
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Title {
