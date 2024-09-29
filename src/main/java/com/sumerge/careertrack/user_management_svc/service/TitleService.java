@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.sumerge.careertrack.user_management_svc.entities.Title;
 import com.sumerge.careertrack.user_management_svc.entities.compositeKeys.TitleId;
-import com.sumerge.careertrack.user_management_svc.exceptions.TitleDoesNotExistException;
+import com.sumerge.careertrack.user_management_svc.exceptions.AlreadyExistsException;
+import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleResponseDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleMapper;
@@ -38,7 +39,8 @@ public class TitleService {
         boolean titleExists = titleRepository
                 .existsById(new TitleId(titleDTO.getDepartmentName(), titleDTO.getTitleName()));
         if (titleExists) {
-            throw new RuntimeException("Title already exists");
+            throw new AlreadyExistsException(AlreadyExistsException.TITLE,
+                    titleDTO.getTitleName(), titleDTO.getDepartmentName());
         }
 
         Title newTitle = titleRepository.save(title);
@@ -48,7 +50,8 @@ public class TitleService {
     public TitleResponseDTO getById(String deptName, String titleName) {
         TitleId id = new TitleId(deptName, titleName);
         Title title = titleRepository.findById(id)
-                .orElseThrow(() -> new TitleDoesNotExistException("Title not found"));
+                .orElseThrow(() -> new DoesNotExistException(DoesNotExistException.TITLE,
+                        titleName, deptName));
         return titleMapper.toDTO(title);
     }
 
@@ -56,7 +59,8 @@ public class TitleService {
         TitleId id = new TitleId(deptName, titleName);
         Title title = titleRepository.findById(id)
                 .orElseThrow(
-                        () -> new TitleDoesNotExistException("No Title with the ID %d found in the system!", id));
+                        () -> new DoesNotExistException(DoesNotExistException.TITLE,
+                                titleName, deptName));
         titleRepository.delete(title);
     }
 }

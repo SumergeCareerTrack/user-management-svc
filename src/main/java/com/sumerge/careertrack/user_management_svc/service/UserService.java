@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.sumerge.careertrack.user_management_svc.entities.AppUser;
 import com.sumerge.careertrack.user_management_svc.entities.Title;
-import com.sumerge.careertrack.user_management_svc.exceptions.AppUserAlreadyExistsException;
-import com.sumerge.careertrack.user_management_svc.exceptions.AppUserDoesNotExistException;
+import com.sumerge.careertrack.user_management_svc.exceptions.AlreadyExistsException;
+import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserMapper;
 import com.sumerge.careertrack.user_management_svc.repositories.AppUserRepository;
@@ -35,15 +35,15 @@ public class UserService {
 
     public AppUserRequestDTO getById(UUID userId) {
         AppUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppUserDoesNotExistException(
-                        String.format("AppUser with ID %d does not exist", userId)));
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.APP_USER_ID, userId));
         return userMapper.toResponseDTO(user);
     }
 
     public AppUserRequestDTO getByEmail(String email) {
         AppUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new AppUserDoesNotExistException(
-                        String.format("AppUser with email %d does not exist", email)));
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.APP_USER_EMAIL, email));
         return userMapper.toResponseDTO(user);
     }
 
@@ -58,8 +58,8 @@ public class UserService {
 
     public List<AppUserRequestDTO> getSubordinates(UUID managerId) {
         AppUser manager = userRepository.findById(managerId)
-                .orElseThrow(() -> new AppUserDoesNotExistException(
-                        String.format("Manager with ID %d doesn't manage any employees", managerId)));
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.APP_USER_ID, managerId));
 
         List<AppUser> users = userRepository.findAllByManager(manager);
         return users.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
@@ -72,8 +72,8 @@ public class UserService {
 
     public AppUserRequestDTO getManager(UUID userId) {
         AppUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppUserDoesNotExistException(
-                        String.format("AppUser with ID %d does not exist", userId)));
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.APP_USER_ID, userId));
 
         AppUser userManager = user.getManager(); // TODO test if user has no manager
         return userMapper.toResponseDTO(userManager);
@@ -84,7 +84,8 @@ public class UserService {
         boolean userExists = userRepository.existsByEmail(userObj.getEmail());
 
         if (userExists) {
-            throw new AppUserAlreadyExistsException("User with email \"%f\" already exists.");
+            throw new AlreadyExistsException(AlreadyExistsException.APP_USER_EMAIL,
+                    userObj.getEmail());
         }
 
         AppUser savedUser = userRepository.save(userObj);
@@ -94,16 +95,16 @@ public class UserService {
     public AppUserRequestDTO updateUser(AppUserRequestDTO userDTO) {
         AppUser userObj = userMapper.toAppUser(userDTO);
         userRepository.findById(userObj.getId())
-                .orElseThrow(() -> new AppUserDoesNotExistException(
-                        String.format("AppUser with ID %d does not exist", userObj.getId())));
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.APP_USER_ID, userObj.getId()));
         AppUser updatedUser = userRepository.save(userObj);
         return userMapper.toResponseDTO(updatedUser);
     }
 
     public void deleteUser(UUID userId) {
         AppUser user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppUserDoesNotExistException(
-                        String.format("AppUser with ID %d does not exist", userId)));
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.APP_USER_ID, userId));
         userRepository.delete(user);
     }
 
