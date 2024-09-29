@@ -7,26 +7,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ TitleDoesNotExistException.class })
-    public ResponseEntity<Object> handleCourseDoesNotExistException(TitleDoesNotExistException exception) {
+    @ExceptionHandler({ DoesNotExistException.class })
+    public ResponseEntity<Object> handleCourseAlreadyExistsException(DoesNotExistException exception) {
         return ResponseEntity.badRequest()
                 .body(exception.getMessage());
     }
 
-    @ExceptionHandler({ AppUserDoesNotExistException.class })
-    public ResponseEntity<Object> handleCourseAlreadyExistsException(AppUserDoesNotExistException exception) {
-        return ResponseEntity.badRequest()
-                .body(exception.getMessage());
-    }
-
-    @ExceptionHandler({ AppUserAlreadyExistsException.class })
-    public ResponseEntity<Object> handleCourseAlreadyExistsException(AppUserAlreadyExistsException exception) {
-        return ResponseEntity.badRequest()
-                .body(exception.getMessage());
-    }
-
-    @ExceptionHandler({ TitleAlreadyExistsException.class })
-    public ResponseEntity<Object> handleCourseAlreadyExistsException(TitleAlreadyExistsException exception) {
+    @ExceptionHandler({ AlreadyExistsException.class })
+    public ResponseEntity<Object> handleCourseAlreadyExistsException(AlreadyExistsException exception) {
         return ResponseEntity.badRequest()
                 .body(exception.getMessage());
     }
