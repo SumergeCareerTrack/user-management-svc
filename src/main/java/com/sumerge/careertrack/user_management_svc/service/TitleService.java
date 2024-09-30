@@ -10,6 +10,9 @@ import com.sumerge.careertrack.user_management_svc.entities.Department;
 import com.sumerge.careertrack.user_management_svc.entities.Title;
 import com.sumerge.careertrack.user_management_svc.exceptions.AlreadyExistsException;
 import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
+import com.sumerge.careertrack.user_management_svc.mappers.DepartmentMapper;
+import com.sumerge.careertrack.user_management_svc.mappers.DepartmentRequestDTO;
+import com.sumerge.careertrack.user_management_svc.mappers.DepartmentResponseDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleMapper;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleResponseDTO;
@@ -28,9 +31,17 @@ public class TitleService {
     @Autowired
     DepartmentRepository deptRepo;
 
-    public List<TitleResponseDTO> getAll() {
+    @Autowired
+    DepartmentMapper deptMapper;
+
+    public List<TitleResponseDTO> getAllTitles() {
         List<Title> titles = titleRepository.findAll();
         return titles.stream().map(titleMapper::toDTO).collect(Collectors.toList());
+    }
+
+    public List<DepartmentResponseDTO> getAllDepartments() {
+        List<Department> titles = deptRepo.findAll();
+        return titles.stream().map(deptMapper::toDTO).collect(Collectors.toList());
     }
 
     public List<TitleResponseDTO> findByDept(String departmentName) {
@@ -44,15 +55,28 @@ public class TitleService {
                 .orElseThrow(() -> new DoesNotExistException(DoesNotExistException.DEPARTMENT, dto.getDepartmentId()));
 
         boolean titleExists = titleRepository
-                .existsByNameAndDepartmentName(dto.getName(), dto.getName());
+                .existsByNameAndDepartmentName(dto.getName(), dept.getName());
 
         if (titleExists) {
             throw new AlreadyExistsException(AlreadyExistsException.TITLE,
                     dto.getName(), dept.getName());
         }
 
+        title.setDepartment(dept);
         Title newTitle = titleRepository.save(title);
         return titleMapper.toDTO(newTitle);
+    }
+
+    public DepartmentResponseDTO createDepartment(DepartmentRequestDTO dto) {
+        boolean deptExists = deptRepo.existsByName(dto.getName());
+
+        if (deptExists) {
+            throw new AlreadyExistsException(AlreadyExistsException.DEPARTMENT, dto.getName());
+        }
+
+        Department dept = Department.builder().name(dto.getName()).build();
+        deptRepo.save(dept);
+        return deptMapper.toDTO(dept);
     }
 
     public TitleResponseDTO findByDepartmentAndTitle(String deptName, String titleName) {
