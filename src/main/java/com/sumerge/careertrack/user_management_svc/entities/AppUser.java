@@ -36,7 +36,6 @@ public class AppUser {
     @Column(nullable = false)
     private String password;
 
-    @JoinColumn(nullable = false)
     @ManyToOne
     private AppUser manager;
 
