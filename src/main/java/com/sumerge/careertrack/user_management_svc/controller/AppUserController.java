@@ -33,6 +33,12 @@ public class AppUserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/managers") // TODO review naming
+    public ResponseEntity<List<AppUserResponseDTO>> getManagersByDept(@RequestBody String departmentName) {
+        List<AppUserResponseDTO> users = userService.getManagersByDept(departmentName);
+        return ResponseEntity.ok(users);
+    }
+
     @GetMapping("/{email}") // TODO Review RequestBody vs PathVariable
     public ResponseEntity<AppUserResponseDTO> getByEmail(@PathVariable String email) {
         AppUserResponseDTO user = userService.getByEmail(email);
@@ -42,12 +48,6 @@ public class AppUserController {
     @GetMapping("/{titleName}")
     public ResponseEntity<List<AppUserResponseDTO>> getAllByTitle(@PathVariable String titleName) {
         List<AppUserResponseDTO> users = userService.getAllByTitle(titleName);
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/managers") // TODO review naming
-    public ResponseEntity<List<AppUserResponseDTO>> getManagersByDept(@RequestBody String departmentName) {
-        List<AppUserResponseDTO> users = userService.getManagersByDept(departmentName);
         return ResponseEntity.ok(users);
     }
 
@@ -63,7 +63,7 @@ public class AppUserController {
         return ResponseEntity.ok(manager);
     }
 
-    @GetMapping("/{managerId}")
+    @GetMapping("/{userId}/subordinates")
     public ResponseEntity<List<AppUserResponseDTO>> getSubordinates(@PathVariable UUID managerId) {
         List<AppUserResponseDTO> subordinates = userService.getSubordinates(managerId);
         return ResponseEntity.ok(subordinates);
