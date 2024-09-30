@@ -39,33 +39,27 @@ public class AppUserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/{email}") // TODO Review RequestBody vs PathVariable
-    public ResponseEntity<AppUserResponseDTO> getByEmail(@PathVariable String email) {
-        AppUserResponseDTO user = userService.getByEmail(email);
-        return ResponseEntity.ok(user);
-    }
-
-    @GetMapping("/{titleName}")
-    public ResponseEntity<List<AppUserResponseDTO>> getAllByTitle(@PathVariable String titleName) {
-        List<AppUserResponseDTO> users = userService.getAllByTitle(titleName);
-        return ResponseEntity.ok(users);
-    }
-
     @GetMapping("/{userId}")
     public ResponseEntity<AppUserResponseDTO> getById(@PathVariable UUID userId) {
         AppUserResponseDTO user = userService.getById(userId);
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/{userId}/manager") // TODO review need for extra endpoint
-    public ResponseEntity<AppUserResponseDTO> getManager(@PathVariable UUID userId) {
-        AppUserResponseDTO manager = userService.getManager(userId);
-        return ResponseEntity.ok(manager);
+    @GetMapping("/email/{email}") // TODO Review RequestBody vs PathVariable
+    public ResponseEntity<AppUserResponseDTO> getByEmail(@PathVariable String email) {
+        AppUserResponseDTO user = userService.getByEmail(email);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/title/{titleName}")
+    public ResponseEntity<List<AppUserResponseDTO>> getAllByTitle(@PathVariable String titleName) {
+        List<AppUserResponseDTO> users = userService.getAllByTitle(titleName);
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{userId}/subordinates")
-    public ResponseEntity<List<AppUserResponseDTO>> getSubordinates(@PathVariable UUID managerId) {
-        List<AppUserResponseDTO> subordinates = userService.getSubordinates(managerId);
+    public ResponseEntity<List<AppUserResponseDTO>> getSubordinates(@PathVariable UUID userId) {
+        List<AppUserResponseDTO> subordinates = userService.getSubordinates(userId);
         return ResponseEntity.ok(subordinates);
     }
 

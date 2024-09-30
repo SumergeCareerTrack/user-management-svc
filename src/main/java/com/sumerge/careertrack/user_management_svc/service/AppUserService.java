@@ -102,23 +102,25 @@ public class AppUserService {
     }
 
     public AppUserResponseDTO updateUser(AppUserRequestDTO dto) {
-        AppUser userObj = userMapper.toAppUser(dto);
 
-        userRepository.findById(userObj.getId())
+        AppUser userObj = userRepository.findById(dto.getId())
                 .orElseThrow(() -> new DoesNotExistException(
-                        DoesNotExistException.APP_USER_ID, userObj.getId()));
+                        DoesNotExistException.APP_USER_ID, dto.getId()));
 
-        AppUser manager = userRepository.findById(dto.getManagerId())
-                .orElseThrow(() -> new DoesNotExistException(
-                        DoesNotExistException.APP_USER_ID, dto.getManagerId()));
+        if (dto.getManagerId() != null) {
+            AppUser manager = userRepository.findById(dto.getManagerId())
+                    .orElseThrow(() -> new DoesNotExistException(
+                            DoesNotExistException.APP_USER_ID, dto.getManagerId()));
+            userObj.setManager(manager);
+        }
 
-        Title title = titlesRepository.findById(dto.getTitleId())
-                .orElseThrow(() -> new DoesNotExistException(
-                        DoesNotExistException.TITLE, dto.getTitleId()));
-
-        userObj.setManager(manager);
-        userObj.setTitle(title);
-        userObj.setDepartment(title.getDepartment());
+        if (dto.getTitleId() != null) {
+            Title title = titlesRepository.findById(dto.getTitleId())
+                    .orElseThrow(() -> new DoesNotExistException(
+                            DoesNotExistException.TITLE, dto.getTitleId()));
+            userObj.setTitle(title);
+            userObj.setDepartment(title.getDepartment());
+        }
 
         AppUser updatedUser = userRepository.save(userObj);
         return userMapper.toResponseDTO(updatedUser);
