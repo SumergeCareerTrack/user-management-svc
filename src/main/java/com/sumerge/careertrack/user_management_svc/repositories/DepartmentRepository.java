@@ -11,4 +11,6 @@ import com.sumerge.careertrack.user_management_svc.entities.Department;
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, UUID> {
     Optional<Department> findByName(String name);
+
+    boolean existsByName(String name);
 }
