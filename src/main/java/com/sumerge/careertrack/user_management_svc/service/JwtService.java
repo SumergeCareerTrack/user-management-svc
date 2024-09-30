@@ -34,7 +34,7 @@ public class JwtService {
     @PostConstruct
     public void init() {
         jedis = new Jedis(redisURL);
-    };
+    }
 
     public String extractUserEmail(String token) {
 
@@ -87,7 +87,7 @@ public class JwtService {
         .getBody();
     }
     private Key getSignInKey() { //TODO 1: Understand this method
-        byte keyBytes[] = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
 
     }
@@ -101,13 +101,6 @@ public class JwtService {
         json.put("expirationTimeInSeconds", expirationTimeInSeconds);
         jedis.set(email, json.toString());
         }
-    
-    public String getTokenFromRedis(String email) {
-        String token = jedis.get(email);
-        JSONObject json = new JSONObject(token);
-        return json.getString("token"); 
-    }
-
 
 
 }
