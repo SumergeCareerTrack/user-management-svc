@@ -23,7 +23,6 @@ import redis.clients.jedis.Jedis;
 @RequiredArgsConstructor
 public class AuthService {
     
-    private final Jedis jedis;
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -50,6 +49,7 @@ public class AuthService {
         }
     }
 
+    //TODO: Review Exception
     public AuthenticationResponse login(AuthenticationRequest request) {
         try {
             authenticationManager.authenticate(
@@ -61,7 +61,7 @@ public class AuthService {
         } catch (AuthenticationException e) {
             throw new RuntimeException("Invalid email or password");
         }
-        // TODO: We might not need this or else throw exception
+
         var user = appUserRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new AppUserDoesNotExistException(
                         String.format("AppUser with email %d does not exist", request.getEmail())));

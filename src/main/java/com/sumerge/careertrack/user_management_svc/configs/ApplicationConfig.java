@@ -21,11 +21,14 @@ public class ApplicationConfig {
     @Autowired
     private final AppUserRepository userRepository;
 
+    //TODO: Ammend/Change the exception
     @Bean
     public UserDetailsService userDetailsService(){
-        return username -> userRepository.findByEmail(username).orElseThrow(() -> new RuntimeException("User not found"));
-
+        return username ->
+                userRepository.findByEmail(username)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();

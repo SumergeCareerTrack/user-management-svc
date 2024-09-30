@@ -55,6 +55,7 @@ public class AppUser implements UserDetails{
     @JoinColumn(name = "title", nullable = false)
     private Title title;
 
+    //TODO: might change it later to use an ENUM for different roles (To be reviewed)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("EMPLOYEE"));

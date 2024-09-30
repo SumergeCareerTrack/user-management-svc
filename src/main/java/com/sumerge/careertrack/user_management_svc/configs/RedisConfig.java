@@ -19,13 +19,12 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private Integer redisPort;
 
-    @Value("${spring.data.redis.pass}")
-    private String redisPass;
 
 
-        @Bean
+    @Bean
     public JedisPool jedisPool() {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setJmxEnabled(false);
         return new JedisPool(poolConfig, redisHost, redisPort); 
     }
 
@@ -33,12 +32,7 @@ public class RedisConfig {
     public Jedis jedis(JedisPool jedisPool) {
         return jedisPool.getResource(); 
     }
-    // @Bean
-    // @Primary
-    // JedisConnectionFactory jedisConnectionFactory() {
-    // RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
-    // redisStandaloneConfiguration.setPassword(RedisPassword.of(redisPass));
-    // return new JedisConnectionFactory(redisStandaloneConfiguration);
+
 }
 
 

@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
+    //TODO: try to make the userDetailsService Final and remove the @Autowired
     @Autowired
     private UserDetailsService userDetailsService;
     @Override
@@ -35,8 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 final String authorizationHeader = request.getHeader("Authorization");
                 final String jwt;
                 final String userEmail;
-
-
                 if (authorizationHeader == null ||  ( !authorizationHeader.startsWith("Bearer "))) {
                     filterChain.doFilter(request, response);
                     
@@ -47,8 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if(userEmail!=null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
                     if(jwtService.isTokenValid(jwt, userDetails)) {
-                        System.out.println("HELLOOOOOOOOOOOOOOO");
-                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(
                             userDetails, 
                             null, 
                             userDetails.getAuthorities());
