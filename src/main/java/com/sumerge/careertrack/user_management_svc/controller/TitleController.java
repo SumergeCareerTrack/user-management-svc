@@ -38,13 +38,14 @@ public class TitleController {
 
     @GetMapping("/{deptName}/{titleName}")
     public TitleResponseDTO getById(@PathVariable String deptName, @PathVariable String titleName) {
-        TitleResponseDTO title = titleService.getById(deptName, titleName);
+        TitleResponseDTO title = titleService.findByDepartmentAndTitle(deptName, titleName);
         return title;
     }
 
     /* Post Mappings */
     @PostMapping("/")
     public ResponseEntity<TitleResponseDTO> createTitle(@RequestBody TitleRequestDTO title) {
+        System.out.println(title);
         TitleResponseDTO newTitle = titleService.createTitle(title);
         return ResponseEntity.ok(newTitle);
     }
