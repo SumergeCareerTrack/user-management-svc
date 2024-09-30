@@ -20,8 +20,7 @@ public class RegisterRequest {
     private String firstName;
     private String lastName;
     private UUID managerId;
-    private String department;
-    private String title;
-    private boolean isManager;
-    
+    private UUID department;
+    private UUID title;
+
 }

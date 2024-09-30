@@ -1,5 +1,6 @@
 package com.sumerge.careertrack.user_management_svc.service;
 
+import com.sumerge.careertrack.user_management_svc.repositories.TitleRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -27,6 +28,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final TitleRepository titleRepository;
 
     public AuthenticationResponse register(RegisterRequest request) {
         var newUser = AppUser.builder()
@@ -35,7 +37,8 @@ public class AuthService {
             .firstName(request.getFirstName())
             .lastName(request.getLastName())
             .manager(appUserRepository.findById(request.getManagerId()).get())
-            .title(new Title(new TitleId(request.getDepartment(), request.getTitle()), request.isManager()))
+            .title(titleRepository.findById(request.getTitle()).get())
+            .department(titleRepository.findById(request.getTitle()).get().getDepartment())
             .build();
         if(appUserRepository.findByEmail(request.getEmail()).isPresent())
             throw new AppUserAlreadyExistsException("User with email \"%f\" already exists.");
