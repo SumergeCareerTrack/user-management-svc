@@ -8,9 +8,11 @@ import com.sumerge.careertrack.user_management_svc.entities.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class AppUserResponseDTO {
 
