@@ -11,12 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TitleRequestDTO {
-    @lombok.NonNull
-    private UUID departmentId;
-
-    @lombok.NonNull
+public class DepartmentResponseDTO {
+    private UUID id;
     private String name;
-
-    private boolean isManager;
 }

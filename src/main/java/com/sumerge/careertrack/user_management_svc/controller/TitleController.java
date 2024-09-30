@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sumerge.careertrack.user_management_svc.mappers.DepartmentRequestDTO;
+import com.sumerge.careertrack.user_management_svc.mappers.DepartmentResponseDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleResponseDTO;
 import com.sumerge.careertrack.user_management_svc.service.TitleService;
@@ -25,28 +27,40 @@ public class TitleController {
 
     /* Get Mappings */
     @GetMapping("/")
-    public ResponseEntity<List<TitleResponseDTO>> getAll() {
-        List<TitleResponseDTO> titles = titleService.getAll();
+    public ResponseEntity<List<TitleResponseDTO>> getAllTitles() {
+        List<TitleResponseDTO> titles = titleService.getAllTitles();
         return ResponseEntity.ok(titles);
     }
 
+    @GetMapping("/departments")
+    public ResponseEntity<List<DepartmentResponseDTO>> getAllDepartments() {
+        List<DepartmentResponseDTO> depts = titleService.getAllDepartments();
+        return ResponseEntity.ok(depts);
+    }
+
     @GetMapping("/{deptName}")
-    public ResponseEntity<List<TitleResponseDTO>> getAllByDept(String deptName) {
+    public ResponseEntity<List<TitleResponseDTO>> getAllByDept(@PathVariable String deptName) {
         List<TitleResponseDTO> titles = titleService.findByDept(deptName);
         return ResponseEntity.ok(titles);
     }
 
     @GetMapping("/{deptName}/{titleName}")
     public TitleResponseDTO getById(@PathVariable String deptName, @PathVariable String titleName) {
-        TitleResponseDTO title = titleService.getById(deptName, titleName);
+        TitleResponseDTO title = titleService.findByDepartmentAndTitle(deptName, titleName);
         return title;
     }
 
     /* Post Mappings */
-    @PostMapping("/")
+    @PostMapping("/newTitle")
     public ResponseEntity<TitleResponseDTO> createTitle(@RequestBody TitleRequestDTO title) {
         TitleResponseDTO newTitle = titleService.createTitle(title);
         return ResponseEntity.ok(newTitle);
+    }
+
+    @PostMapping("/newDepartment")
+    public ResponseEntity<DepartmentResponseDTO> createDepartment(@RequestBody DepartmentRequestDTO dept) {
+        DepartmentResponseDTO newDept = titleService.createDepartment(dept);
+        return ResponseEntity.ok(newDept);
     }
 
     /* Delete Mappings */

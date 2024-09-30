@@ -1,7 +1,5 @@
 package com.sumerge.careertrack.user_management_svc.mappers;
 
-import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,12 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TitleRequestDTO {
-    @lombok.NonNull
-    private UUID departmentId;
-
-    @lombok.NonNull
+public class DepartmentRequestDTO {
     private String name;
-
-    private boolean isManager;
 }

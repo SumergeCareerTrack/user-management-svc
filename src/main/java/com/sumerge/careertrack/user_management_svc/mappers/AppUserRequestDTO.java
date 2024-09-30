@@ -5,9 +5,11 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class AppUserRequestDTO {
 
@@ -19,7 +21,11 @@ public class AppUserRequestDTO {
 
     private String email;
 
-    private String departmentName;
+    private String password;
 
-    private String title;
+    private UUID departmentId;
+
+    private UUID titleId;
+
+    private UUID managerId;
 }

@@ -31,28 +31,27 @@ public class AppUser implements UserDetails{
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @lombok.NonNull
     @Column(nullable = false)
     private String firstName;
 
-    @lombok.NonNull
     @Column(nullable = false)
     private String lastName;
 
-    @lombok.NonNull
     @Column(nullable = false)
     private String email;
 
-    @lombok.NonNull
     @Column(nullable = false)
     private String password;
 
     @ManyToOne
     private AppUser manager;
 
+    @JoinColumn(nullable = false)
     @ManyToOne
-    @JoinColumn(name = "department", nullable = false)
-    @JoinColumn(name = "title", nullable = false)
+    private Department department;
+
+    @JoinColumn(nullable = false)
+    @ManyToOne
     private Title title;
 
     //TODO: might change it later to use an ENUM for different roles (To be reviewed)

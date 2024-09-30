@@ -11,13 +11,15 @@ import com.sumerge.careertrack.user_management_svc.entities.AppUser;
 import com.sumerge.careertrack.user_management_svc.entities.Title;
 import com.sumerge.careertrack.user_management_svc.exceptions.AlreadyExistsException;
 import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
-import com.sumerge.careertrack.user_management_svc.mappers.AppUserRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserMapper;
+import com.sumerge.careertrack.user_management_svc.mappers.AppUserRequestDTO;
+import com.sumerge.careertrack.user_management_svc.mappers.AppUserResponseDTO;
 import com.sumerge.careertrack.user_management_svc.repositories.AppUserRepository;
+import com.sumerge.careertrack.user_management_svc.repositories.DepartmentRepository;
 import com.sumerge.careertrack.user_management_svc.repositories.TitleRepository;
 
 @Service
-public class UserService {
+public class AppUserService {
 
     @Autowired
     AppUserRepository userRepository;
@@ -26,37 +28,44 @@ public class UserService {
     TitleRepository titlesRepository;
 
     @Autowired
+    DepartmentRepository deptRepository;
+
+    @Autowired
     AppUserMapper userMapper;
 
-    public List<AppUserRequestDTO> getAll() {
+    public List<AppUserResponseDTO> getAll() {
         List<AppUser> users = userRepository.findAll();
         return users.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
     }
 
-    public AppUserRequestDTO getById(UUID userId) {
+    public AppUserResponseDTO getById(UUID userId) {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new DoesNotExistException(
                         DoesNotExistException.APP_USER_ID, userId));
         return userMapper.toResponseDTO(user);
     }
 
-    public AppUserRequestDTO getByEmail(String email) {
+    public AppUserResponseDTO getByEmail(String email) {
         AppUser user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new DoesNotExistException(
                         DoesNotExistException.APP_USER_EMAIL, email));
         return userMapper.toResponseDTO(user);
     }
 
-    public List<AppUserRequestDTO> getManagersByDept(String deptName) {
-        List<Title> titles = titlesRepository.findByIdDepartment(deptName);
+    public List<AppUserResponseDTO> getManagersByDept(String deptName) {
+        List<Title> titles = titlesRepository.findByDepartmentName(deptName);
         List<AppUser> managers = titles.stream()
                 .filter(title -> title.isManager())
-                .flatMap(title -> userRepository.findAllByTitleId(title.getId()).stream())
+                .flatMap(title -> {
+                    List<AppUser> users = userRepository.findByTitle(title);
+                    return users.stream();
+                })
                 .collect(Collectors.toList());
+
         return managers.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
     }
 
-    public List<AppUserRequestDTO> getSubordinates(UUID managerId) {
+    public List<AppUserResponseDTO> getSubordinates(UUID managerId) {
         AppUser manager = userRepository.findById(managerId)
                 .orElseThrow(() -> new DoesNotExistException(
                         DoesNotExistException.APP_USER_ID, managerId));
@@ -65,12 +74,12 @@ public class UserService {
         return users.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
     }
 
-    public List<AppUserRequestDTO> getAllByTitle(String titleName) {
-        List<AppUser> users = userRepository.findByTitleIdName(titleName);
+    public List<AppUserResponseDTO> getAllByTitle(String titleName) {
+        List<AppUser> users = userRepository.findByTitleName(titleName);
         return users.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
     }
 
-    public AppUserRequestDTO getManager(UUID userId) {
+    public AppUserResponseDTO getManager(UUID userId) {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new DoesNotExistException(
                         DoesNotExistException.APP_USER_ID, userId));
@@ -79,7 +88,7 @@ public class UserService {
         return userMapper.toResponseDTO(userManager);
     }
 
-    public AppUserRequestDTO createUser(AppUserRequestDTO userDTO) {
+    public AppUserResponseDTO createUser(AppUserRequestDTO userDTO) {
         AppUser userObj = userMapper.toAppUser(userDTO);
         boolean userExists = userRepository.existsByEmail(userObj.getEmail());
 
@@ -92,11 +101,25 @@ public class UserService {
         return userMapper.toResponseDTO(savedUser);
     }
 
-    public AppUserRequestDTO updateUser(AppUserRequestDTO userDTO) {
-        AppUser userObj = userMapper.toAppUser(userDTO);
+    public AppUserResponseDTO updateUser(AppUserRequestDTO dto) {
+        AppUser userObj = userMapper.toAppUser(dto);
+
         userRepository.findById(userObj.getId())
                 .orElseThrow(() -> new DoesNotExistException(
                         DoesNotExistException.APP_USER_ID, userObj.getId()));
+
+        AppUser manager = userRepository.findById(dto.getManagerId())
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.APP_USER_ID, dto.getManagerId()));
+
+        Title title = titlesRepository.findById(dto.getTitleId())
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.TITLE, dto.getTitleId()));
+
+        userObj.setManager(manager);
+        userObj.setTitle(title);
+        userObj.setDepartment(title.getDepartment());
+
         AppUser updatedUser = userRepository.save(userObj);
         return userMapper.toResponseDTO(updatedUser);
     }
