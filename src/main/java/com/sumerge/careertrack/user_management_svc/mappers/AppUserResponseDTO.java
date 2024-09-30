@@ -2,6 +2,9 @@ package com.sumerge.careertrack.user_management_svc.mappers;
 
 import java.util.UUID;
 
+import com.sumerge.careertrack.user_management_svc.entities.Department;
+import com.sumerge.careertrack.user_management_svc.entities.Title;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,9 +22,9 @@ public class AppUserResponseDTO {
 
     private String email;
 
-    private String departmentName;
+    private Department department;
 
-    private String title;
+    private Title title;
 
     private UUID managerId;
 }
