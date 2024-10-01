@@ -9,9 +9,11 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
+import com.sumerge.careertrack.user_management_svc.exceptions.UserManagementException;
 import com.sumerge.careertrack.user_management_svc.repositories.AppUserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,16 +24,15 @@ public class ApplicationConfig {
     @Autowired
     private final AppUserRepository userRepository;
 
-    //TODO: Ammend/Change the exception
     @Bean
-    public UserDetailsService userDetailsService(){
-        return username ->
-                userRepository.findByEmail(username)
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+    public UserDetailsService userDetailsService() {
+        return email -> userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserManagementException(
+                        "How did you get here??"));
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(){
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
@@ -39,12 +40,12 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-       return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 }
