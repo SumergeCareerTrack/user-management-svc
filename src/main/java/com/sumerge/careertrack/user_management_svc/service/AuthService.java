@@ -2,6 +2,7 @@ package com.sumerge.careertrack.user_management_svc.service;
 
 import java.util.UUID;
 
+import com.sumerge.careertrack.user_management_svc.exceptions.InvalidCredentialsException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -34,6 +35,7 @@ public class AuthService {
     private final DepartmentRepository deptRepository;
 
     public AuthenticationResponse register(RegisterRequest request) {
+        System.out.println(appUserRepository.existsByEmail(request.getEmail()));
         if (appUserRepository.existsByEmail(request.getEmail())) {
             throw new AlreadyExistsException(
                     AlreadyExistsException.APP_USER_EMAIL, request.getEmail());
@@ -79,7 +81,7 @@ public class AuthService {
                             request.getEmail(),
                             request.getPassword()));
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Invalid email or password");
+            throw new InvalidCredentialsException();
         }
 
         AppUser user = appUserRepository.findByEmail(request.getEmail())
