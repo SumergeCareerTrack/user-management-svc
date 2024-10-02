@@ -30,8 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -197,6 +196,23 @@ public class AuthServiceTests {
         DoesNotExistException exception = assertThrows(DoesNotExistException.class, () -> authService.login(authRequest));
 
         assertEquals(String.format(DoesNotExistException.APP_USER_EMAIL,this.authRequest.getEmail()), exception.getMessage());
+    }
+
+    @Test
+    public void logout_UserLoggedIn_ReturnsTrue(){
+        when(jwtService.setExpiryDate(this.testUser.getEmail(),0)).thenReturn(true);
+        assertTrue(authService.logout(this.testUser.getEmail()));
+
+    }
+
+    @Test
+    public void logout_NoUserInSystem_ThrowsIllegalArgumentException(){
+        when(jwtService.setExpiryDate(this.testUser.getEmail(),0)).thenThrow( new IllegalArgumentException("No token found for the provided email: " + this.testUser.getEmail()));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> authService.logout(this.testUser.getEmail()));
+
+        assertEquals("No token found for the provided email: " + this.testUser.getEmail(), exception.getMessage());
+
+
     }
 //TODO 01: Review with youssef If we need a NULL one because it throws Does not exist , It passes the try catch in the Serivce ???
 //    @Test

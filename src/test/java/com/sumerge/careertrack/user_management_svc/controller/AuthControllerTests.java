@@ -221,4 +221,11 @@ public class AuthControllerTests {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof InvalidCredentialsException))
                 .andExpect(content().string((InvalidCredentialsException.DEFAULT)));
     }
+    @Test
+    public void logout_ValidRequest_ReturnsOk() throws Exception {
+        ResultActions response = mockMvc.perform(post("/auth/logout/{email}",this.testUser.getEmail())
+                .header("Authorization","Bearer TOKEN")
+                .contentType(MediaType.APPLICATION_JSON));
+        response.andExpect(status().isOk());
+    }
 }

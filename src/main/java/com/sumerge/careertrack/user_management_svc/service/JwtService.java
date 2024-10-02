@@ -117,11 +117,12 @@ public class JwtService {
     public boolean isTokenInRedis(String email) {
         return jedis.exists(email);
     }
-    public void setExpiryDate(String email, long seconds) {
+    public boolean setExpiryDate(String email, long seconds) {
         try{
             String tokenData = jedis.get(email);
             if (tokenData != null) {
                 jedis.expire(email, seconds);
+                return true;
             } else {
                 throw new IllegalArgumentException("No token found for the provided email: " + email);
             }

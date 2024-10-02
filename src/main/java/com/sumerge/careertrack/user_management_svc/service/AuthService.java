@@ -92,8 +92,9 @@ public class AuthService {
 
     }
 
-    public void logout(String email) {
+    public boolean logout(String email) {
         jwtService.setExpiryDate(email,0);
+        return true;
     }
 
 }
