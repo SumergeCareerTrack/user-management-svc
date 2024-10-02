@@ -2,10 +2,9 @@ package com.sumerge.careertrack.user_management_svc.service;
 
 import com.sumerge.careertrack.user_management_svc.entities.Department;
 import com.sumerge.careertrack.user_management_svc.entities.Title;
-import com.sumerge.careertrack.user_management_svc.mappers.DepartmentMapper;
-import com.sumerge.careertrack.user_management_svc.mappers.DepartmentResponseDTO;
-import com.sumerge.careertrack.user_management_svc.mappers.TitleMapper;
-import com.sumerge.careertrack.user_management_svc.mappers.TitleResponseDTO;
+import com.sumerge.careertrack.user_management_svc.exceptions.AlreadyExistsException;
+import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
+import com.sumerge.careertrack.user_management_svc.mappers.*;
 import com.sumerge.careertrack.user_management_svc.repositories.DepartmentRepository;
 import com.sumerge.careertrack.user_management_svc.repositories.TitleRepository;
 import org.junit.jupiter.api.Test;
@@ -123,4 +122,186 @@ class TitleServiceTest {
         verify(titleMapper).toDTO(title2);
     }
 
+    @Test
+    void findByDept_Not_Successful(){
+        String departmentName = "Not Engineering";
+        when(titleRepository.findByDepartmentName(departmentName)).thenReturn(Collections.emptyList());
+        List<TitleResponseDTO> receivedTitles = titleService.findByDept(departmentName);
+        assertEquals(receivedTitles.size(), 0);
+        verify(titleRepository, times(1)).findByDepartmentName(departmentName);
+    }
+
+    @Test
+    void createTitle_Successful() {
+        TitleRequestDTO requestDTO = new TitleRequestDTO();
+        requestDTO.setDepartmentId(UUID.randomUUID());
+        requestDTO.setName("New Title");
+
+        Title title = new Title();
+        title.setName("New Title");
+
+        Department department = new Department();
+        department.setId(requestDTO.getDepartmentId());
+        department.setName("HR");
+
+        Title savedTitle = new Title();
+        savedTitle.setName("New Title");
+        savedTitle.setDepartment(department);
+
+        TitleResponseDTO responseDTO = new TitleResponseDTO();
+        responseDTO.setTitleName("New Title");
+
+        // Mock behavior
+        when(titleMapper.toTitle(requestDTO)).thenReturn(title);
+        when(departmentRepository.findById(requestDTO.getDepartmentId())).thenReturn(Optional.of(department));
+        when(titleRepository.existsByNameAndDepartmentName(requestDTO.getName(), department.getName())).thenReturn(false);
+        when(titleRepository.save(title)).thenReturn(savedTitle);
+        when(titleMapper.toDTO(savedTitle)).thenReturn(responseDTO);
+
+        TitleResponseDTO result = titleService.createTitle(requestDTO);
+
+        assertNotNull(result);
+        assertEquals("New Title", result.getTitleName());
+        verify(departmentRepository, times(1)).findById(requestDTO.getDepartmentId());
+        verify(titleRepository, times(1)).existsByNameAndDepartmentName(requestDTO.getName(), department.getName());
+        verify(titleRepository, times(1)).save(title);
+
+    }
+    @Test
+     void createTitle_Not_Successful_DepartmentNotFound() {
+        TitleRequestDTO requestDTO = new TitleRequestDTO();
+        UUID departmentId = UUID.randomUUID();
+        requestDTO.setDepartmentId(departmentId);
+        requestDTO.setName("New Title");
+        when(departmentRepository.findById(departmentId)).thenReturn(Optional.empty());
+        assertThrows(DoesNotExistException.class, () -> titleService.createTitle(requestDTO));
+
+        verify(titleRepository, times(0)).save(any());
+    }
+
+    @Test
+    void createTitle_Not_Successful_TitleAlreadyExists() {
+        TitleRequestDTO requestDTO = new TitleRequestDTO();
+        UUID departmentId = UUID.randomUUID();
+        requestDTO.setDepartmentId(departmentId);
+        requestDTO.setName("Existing Title");
+
+        Department department = new Department();
+        department.setId(departmentId);
+        department.setName("HR");
+
+        when(departmentRepository.findById(departmentId)).thenReturn(Optional.of(department));
+        when(titleRepository.existsByNameAndDepartmentName(requestDTO.getName(), department.getName())).thenReturn(true);
+
+        assertThrows(AlreadyExistsException.class, () -> titleService.createTitle(requestDTO));
+
+        verify(departmentRepository, times(1)).findById(departmentId);
+        verify(titleRepository, times(1)).existsByNameAndDepartmentName(requestDTO.getName(), department.getName());
+        verify(titleRepository, times(0)).save(any());
+    }
+
+    @Test
+    void createDepartment_Successful() {
+        DepartmentRequestDTO requestDTO = new DepartmentRequestDTO();
+        requestDTO.setName("Finance");
+
+        Department department = Department.builder().name("Finance").build();
+
+        DepartmentResponseDTO responseDTO = new DepartmentResponseDTO();
+        responseDTO.setName("Finance");
+
+        when(departmentRepository.existsByName(requestDTO.getName())).thenReturn(false);
+        when(departmentRepository.save(any(Department.class))).thenReturn(department);
+        when(departmentMapper.toDTO(department)).thenReturn(responseDTO);
+
+        DepartmentResponseDTO result = titleService.createDepartment(requestDTO);
+
+        assertNotNull(result);
+        assertEquals("Finance", result.getName());
+        verify(departmentRepository, times(1)).existsByName(requestDTO.getName());
+        verify(departmentRepository, times(1)).save(any(Department.class));
+        verify(departmentMapper, times(1)).toDTO(department);
+    }
+
+    @Test
+    void createDepartment_Not_Successful_AlreadyExists() {
+        DepartmentRequestDTO requestDTO = new DepartmentRequestDTO();
+        requestDTO.setName("Finance");
+
+        when(departmentRepository.existsByName(requestDTO.getName())).thenReturn(true);
+
+        assertThrows(AlreadyExistsException.class, () -> titleService.createDepartment(requestDTO));
+
+        verify(departmentRepository, times(1)).existsByName(requestDTO.getName());
+        verify(departmentRepository, times(0)).save(any(Department.class));
+        verify(departmentMapper, times(0)).toDTO(any(Department.class));
+    }
+
+    @Test
+    void findByDepartmentAndTitle_Successful() {
+        String departmentName = "HR";
+        String titleName = "Manager";
+
+        Title title = new Title();
+        title.setName(titleName);
+
+        TitleResponseDTO responseDTO = new TitleResponseDTO();
+        responseDTO.setTitleName(titleName);
+
+        when(titleRepository.findByNameAndDepartmentName(titleName, departmentName))
+                .thenReturn(Optional.of(title));
+        when(titleMapper.toDTO(title)).thenReturn(responseDTO);
+
+        TitleResponseDTO result = titleService.findByDepartmentAndTitle(departmentName, titleName);
+
+        assertNotNull(result);
+        assertEquals(titleName, result.getTitleName());
+        verify(titleRepository, times(1)).findByNameAndDepartmentName(titleName, departmentName);
+        verify(titleMapper, times(1)).toDTO(title);
+    }
+
+    @Test
+    void findByDepartmentAndTitle_Not_Successful_NotFound() {
+        String departmentName = "HR";
+        String titleName = "Manager";
+
+        when(titleRepository.findByNameAndDepartmentName(titleName, departmentName))
+                .thenReturn(Optional.empty());
+
+        assertThrows(DoesNotExistException.class, () ->
+                titleService.findByDepartmentAndTitle(departmentName, titleName));
+
+        verify(titleRepository, times(1)).findByNameAndDepartmentName(titleName, departmentName);
+        verify(titleMapper, times(0)).toDTO(any());
+    }
+
+    @Test
+    void deleteTitle_Successful() {
+        String departmentName = "HR";
+        String titleName = "Manager";
+
+        Title title = new Title();
+        title.setName(titleName);
+        when(titleRepository.findByNameAndDepartmentName(titleName, departmentName))
+        .thenReturn(Optional.of(title));
+
+        titleService.deleteTitle(departmentName, titleName);
+
+        verify(titleRepository, times(1)).findByNameAndDepartmentName(titleName, departmentName);
+        verify(titleRepository, times(1)).delete(title);
+    }
+
+    @Test
+    void deleteTitle_Not_Successful() {
+        String departmentName = "HR";
+        String titleName = "Manager";
+
+        when(titleRepository.findByNameAndDepartmentName(titleName, departmentName))
+                .thenReturn(Optional.empty());
+
+        assertThrows(DoesNotExistException.class, () ->
+                titleService.findByDepartmentAndTitle(departmentName, titleName));
+
+        verify(titleRepository, times(1)).findByNameAndDepartmentName(titleName, departmentName);
+    }
 }
