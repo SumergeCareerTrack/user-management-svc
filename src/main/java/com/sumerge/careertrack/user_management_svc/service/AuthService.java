@@ -2,7 +2,6 @@ package com.sumerge.careertrack.user_management_svc.service;
 
 import java.util.UUID;
 
-import com.sumerge.careertrack.user_management_svc.exceptions.InvalidCredentialsException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
