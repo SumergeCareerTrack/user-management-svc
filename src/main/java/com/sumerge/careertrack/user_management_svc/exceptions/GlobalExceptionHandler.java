@@ -8,19 +8,19 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ DoesNotExistException.class })
+    @ExceptionHandler(DoesNotExistException.class)
     public ResponseEntity<Object> handleDoesNotExistException(DoesNotExistException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
-    @ExceptionHandler({ AlreadyExistsException.class })
+    @ExceptionHandler(AlreadyExistsException.class)
     public ResponseEntity<Object> handleAlreadyExistsException(AlreadyExistsException exception) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
+        return ResponseEntity.badRequest()
+                .body(exception.getMessage());
     }
 
     @ExceptionHandler({ InvalidCredentialsException.class })
     public ResponseEntity<Object> handleInvalidCredentialsException(InvalidCredentialsException exception) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exception.getMessage());
     }
-
 }
