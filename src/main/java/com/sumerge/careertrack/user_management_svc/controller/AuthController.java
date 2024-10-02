@@ -31,4 +31,10 @@ public class AuthController {
             @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
+    @PostMapping("/logout/{email}")
+    public ResponseEntity<?> logout(
+            @PathVariable String email) {
+        authService.logout(email);
+        return ResponseEntity.ok().build();
+    }
 }

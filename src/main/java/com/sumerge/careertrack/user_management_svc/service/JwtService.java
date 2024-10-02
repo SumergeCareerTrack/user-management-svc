@@ -28,7 +28,12 @@ public class JwtService {
 
     @Value("${redis.secretkey}")
     private String secretKey;
+    HostAndPort node = HostAndPort.from("localhost:6379");
+    JedisClientConfig clientConfig = DefaultJedisClientConfig.builder()
+            .resp3()
+            .build();
 
+    UnifiedJedis client = new UnifiedJedis(node, clientConfig);
 
     private final Jedis jedis;
 
@@ -109,5 +114,21 @@ public class JwtService {
         jedis.set(email, json.toString());
         }
 
+    public boolean isTokenInRedis(String email) {
+        return jedis.exists(email);
+    }
+    public void setExpiryDate(String email, long seconds) {
+        try{
+            String tokenData = jedis.get(email);
+            if (tokenData != null) {
+                jedis.expire(email, seconds);
+            } else {
+                throw new IllegalArgumentException("No token found for the provided email: " + email);
+            }
+        }
+        catch(Exception e){
+            throw new IllegalArgumentException("No token found for the provided email: " + email);
+        }
 
+    }
 }

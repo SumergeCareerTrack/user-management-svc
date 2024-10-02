@@ -69,7 +69,6 @@ public class AuthService {
 
         appUserRepository.save(newUser);
         String jwtToken = jwtService.generateToken(newUser);
-        jwtService.saveTokenInRedis(request.getEmail(), jwtToken);
         return new AuthenticationResponse(jwtToken);
     }
 
@@ -83,13 +82,18 @@ public class AuthService {
         } catch (AuthenticationException e) {
             throw new InvalidCredentialsException();
         }
-
         AppUser user = appUserRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new DoesNotExistException(
                         DoesNotExistException.APP_USER_EMAIL, request.getEmail()));
-        String jwtToken = jwtService.generateToken(user);
-        jwtService.saveTokenInRedis(request.getEmail(), jwtToken);
-        return new AuthenticationResponse(jwtToken);
+
+            String jwtToken = jwtService.generateToken(user);
+            jwtService.saveTokenInRedis(request.getEmail(), jwtToken);
+            return new AuthenticationResponse(jwtToken);
+
+    }
+
+    public void logout(String email) {
+        jwtService.setExpiryDate(email,0);
     }
 
 }
