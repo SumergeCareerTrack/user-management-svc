@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +29,13 @@ public class JwtService {
     @Value("${redis.secretkey}")
     private String secretKey;
 
-    @Value("${redis.url}")
-    private String redisURL;
 
-    private Jedis jedis;
+    private final Jedis jedis;
 
-    @PostConstruct
-    public void init() {
-        jedis = new Jedis(redisURL);
+    @Autowired
+    public JwtService(Jedis jedis) {
+        this.jedis = jedis;
     }
-
 
 
     public String extractUserEmail(String token) {
