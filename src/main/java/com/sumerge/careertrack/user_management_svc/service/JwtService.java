@@ -5,6 +5,7 @@ import java.util.function.Function;
 import java.util.Date;
 import java.util.Map;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import jakarta.annotation.PostConstruct;
 import redis.clients.jedis.*;
 
 @Service
+
 public class JwtService {
 
     @Value("${redis.secretkey}")
@@ -35,6 +37,8 @@ public class JwtService {
     public void init() {
         jedis = new Jedis(redisURL);
     }
+
+
 
     public String extractUserEmail(String token) {
 
@@ -57,11 +61,16 @@ public class JwtService {
         String tokenFromRedis = json.getString("token");
         return (email.equals(userDetails.getUsername()) && !isTokenExpired(token) && (tokenFromRedis.equals(token)));
     }
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    boolean isTokenExpired(String token) throws ExpiredJwtException {
+        if(!extractExpiration(token).before(new Date())){
+            return false;
+        }
+        else{
+            throw new ExpiredJwtException(null,null,"Token has expired");
+        }
     }
 
-    private Date extractExpiration(String token) {
+    Date extractExpiration(String token) {
         return extractClaim(token,Claims::getExpiration);
     }
 
@@ -78,7 +87,7 @@ public class JwtService {
             .compact();
         }
 
-    private Claims extractAllClaims(String token) {
+    Claims extractAllClaims(String token) {
         return Jwts
         .parserBuilder()
         .setSigningKey(getSignInKey())
@@ -86,7 +95,7 @@ public class JwtService {
         .parseClaimsJws(token)
         .getBody();
     }
-    private Key getSignInKey() { //TODO 1: Understand this method
+    Key getSignInKey() { //TODO 1: Understand this method
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
 
