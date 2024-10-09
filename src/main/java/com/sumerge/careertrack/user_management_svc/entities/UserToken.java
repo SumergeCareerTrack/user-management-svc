@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-@RedisHash(timeToLive = 3600)
+@RedisHash(value = "TOKENS", timeToLive = 3600)
 @Data
 @Builder
 @AllArgsConstructor

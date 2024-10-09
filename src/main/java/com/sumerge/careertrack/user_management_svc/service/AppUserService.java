@@ -42,6 +42,15 @@ public class AppUserService {
         return users.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
     }
 
+    public List<AppUserResponseDTO> getBatch(List<UUID> ids) {
+        return ids.stream()
+                .map(userRepository::findById)
+                .map(user -> user.orElseThrow(() -> new DoesNotExistException(
+                        "One of the supplied IDs does not exist.")))
+                .map(userMapper::toResponseDTO)
+                .toList();
+    }
+
     public AppUserResponseDTO getById(UUID userId) {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new DoesNotExistException(
