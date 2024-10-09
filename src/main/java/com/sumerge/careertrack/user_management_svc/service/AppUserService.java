@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.sumerge.careertrack.user_management_svc.entities.AppUser;
@@ -32,6 +33,9 @@ public class AppUserService {
 
     @Autowired
     AppUserMapper userMapper;
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
+
 
     public List<AppUserResponseDTO> getAll() {
         List<AppUser> users = userRepository.findAll();
@@ -103,6 +107,7 @@ public class AppUserService {
 
     public AppUserResponseDTO updateUser(AppUserRequestDTO dto) {
 
+
         AppUser userObj = userRepository.findById(dto.getId())
                 .orElseThrow(() -> new DoesNotExistException(
                         DoesNotExistException.APP_USER_ID, dto.getId()));
@@ -122,9 +127,22 @@ public class AppUserService {
             userObj.setDepartment(title.getDepartment());
         }
 
+        if (dto.getEmail() != null) {
+            userObj.setEmail(dto.getEmail());
+        }
+
+        if (dto.getFirstName() != null) {
+            userObj.setFirstName(dto.getFirstName());
+        }
+
+        if (dto.getLastName() != null) {
+            userObj.setLastName(dto.getLastName());
+        }
+
         AppUser updatedUser = userRepository.save(userObj);
         return userMapper.toResponseDTO(updatedUser);
     }
+
 
     public void deleteUser(UUID userId) {
         AppUser user = userRepository.findById(userId)
@@ -132,5 +150,13 @@ public class AppUserService {
                         DoesNotExistException.APP_USER_ID, userId));
         userRepository.delete(user);
     }
-
+        //TODO DO ITS TESTS
+    public AppUserResponseDTO changePassword(String password, String userId) {
+        AppUser user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow(() -> new DoesNotExistException(
+                        DoesNotExistException.APP_USER_ID, UUID.fromString(userId)));
+        user.setPassword(passwordEncoder.encode(password));
+        AppUser updatedUser = userRepository.save(user);
+        return userMapper.toResponseDTO(updatedUser);
+    }
 }
