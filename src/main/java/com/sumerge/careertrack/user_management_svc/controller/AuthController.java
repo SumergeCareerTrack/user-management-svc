@@ -1,6 +1,9 @@
 package com.sumerge.careertrack.user_management_svc.controller;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,8 +24,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
@@ -31,10 +33,10 @@ public class AuthController {
             @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
-    @PostMapping("/logout/{email}")
-    public ResponseEntity<?> logout(
-            @PathVariable String email) {
-        authService.logout(email);
-        return ResponseEntity.ok().build();
+
+    @PostMapping("/logout/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public void logout(@PathVariable UUID userId) {
+        authService.logout(userId);
     }
 }

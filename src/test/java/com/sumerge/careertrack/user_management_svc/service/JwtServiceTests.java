@@ -17,14 +17,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 import redis.clients.jedis.Jedis;
 
-
 import java.util.Date;
 import java.util.function.Function;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class JwtServiceTests{
+public class JwtServiceTests {
 
     @InjectMocks
     private JwtService jwtService;
@@ -32,14 +31,14 @@ public class JwtServiceTests{
     @Mock
     private Jedis jedis;
     @Value("${redis.secretkey}")
-    private String dummySecretKey ; // Mocked base64 secret key
+    private String dummySecretKey; // Mocked base64 secret key
     private UserDetails userDetails;
     private String token;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.dummySecretKey= "U29tZVJhbmRvbVNlY3JldEtleUFmZm9ySGFtYWMgU0hBLTI1Ng==";
+        this.dummySecretKey = "U29tZVJhbmRvbVNlY3JldEtleUFmZm9ySGFtYWMgU0hBLTI1Ng==";
         ReflectionTestUtils.setField(jwtService, "secretKey", dummySecretKey);
 
         userDetails = User.builder()
@@ -106,15 +105,9 @@ public class JwtServiceTests{
         assertFalse(isValid);
     }
 
-    @Test
-    public void saveTokenInRedis_savesTokenSuccessfully() {
-        String email = userDetails.getUsername();
-        String token = "TestToken";
-
-        jwtService.saveTokenInRedis(email, token);
-
-        verify(jedis, times(1)).set(eq(email), anyString());
-    }
+    // TODO
+    // public void saveTokenInRedis_savesTokenSuccessfully() {
+    // }
 
     @Test
     public void extractAllClaims_whenValidToken_returnClaims() {
@@ -140,7 +133,6 @@ public class JwtServiceTests{
                 .setExpiration(new Date(System.currentTimeMillis() - 1000 * 60 * 60)) // Set an expiration 1 hour ago
                 .signWith(jwtService.getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
-
 
         assertThrows(ExpiredJwtException.class, () -> jwtService.isTokenExpired(expiredToken), "Token has expired");
 

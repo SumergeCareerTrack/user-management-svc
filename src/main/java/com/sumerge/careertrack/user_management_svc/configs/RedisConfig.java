@@ -3,11 +3,11 @@ package com.sumerge.careertrack.user_management_svc.configs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 @Configuration
 @EnableRedisHttpSession
@@ -19,24 +19,29 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private Integer redisPort;
 
-
-
     @Bean
-    public JedisPool jedisPool() {
-        JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setJmxEnabled(false);
-        return new JedisPool(poolConfig, redisHost, redisPort); 
+    public LettuceConnectionFactory userTokensConnectionFactory() {
+        RedisStandaloneConfiguration redisConfig = new RedisStandaloneConfiguration();
+
+        redisConfig.setHostName(redisHost);
+        redisConfig.setPort(redisPort);
+        redisConfig.setDatabase(0);
+
+        return new LettuceConnectionFactory(redisConfig);
     }
 
     @Bean
-    public Jedis jedis(JedisPool jedisPool) {
-        return jedisPool.getResource(); 
+    public RedisTemplate<String, String> userTokensTemplate(
+            LettuceConnectionFactory userTokensConnectionFactory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(userTokensConnectionFactory);
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new StringRedisSerializer());
+
+        return template;
     }
 
 }
-
-
-
-
-
-
