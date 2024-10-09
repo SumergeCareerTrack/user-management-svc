@@ -3,13 +3,19 @@ package com.sumerge.careertrack.user_management_svc.service;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.sumerge.careertrack.user_management_svc.entities.AppUser;
+import com.sumerge.careertrack.user_management_svc.entities.UserToken;
+import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
+import com.sumerge.careertrack.user_management_svc.repositories.AppUserRepository;
+import com.sumerge.careertrack.user_management_svc.repositories.UserTokenRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -17,33 +23,18 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import redis.clients.jedis.DefaultJedisClientConfig;
-import redis.clients.jedis.HostAndPort;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisClientConfig;
-import redis.clients.jedis.UnifiedJedis;
+import lombok.RequiredArgsConstructor;
 
 @Service
-
+@RequiredArgsConstructor
 public class JwtService {
 
     @Value("${redis.secretkey}")
     private String secretKey;
-    HostAndPort node = HostAndPort.from("localhost:6379");
-    JedisClientConfig clientConfig = DefaultJedisClientConfig.builder()
-            .resp3()
-            .build();
-
-    UnifiedJedis client = new UnifiedJedis(node, clientConfig);
-
-    private final Jedis jedis;
-
-    public JwtService(Jedis jedis) {
-        this.jedis = jedis;
-    }
+    private final UserTokenRepository userTokenRepository;
+    private final AppUserRepository appUserRepository;
 
     public String extractUserEmail(String token) {
-
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -58,9 +49,15 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String email = extractUserEmail(token);
-        JSONObject json = new JSONObject(jedis.get(email));
-        String tokenFromRedis = json.getString("token");
-        return (email.equals(userDetails.getUsername()) && !isTokenExpired(token) && (tokenFromRedis.equals(token)));
+
+        AppUser appUser = appUserRepository.findByEmail(email)
+                .orElseThrow(() -> new DoesNotExistException(DoesNotExistException.APP_USER_EMAIL, email));
+        UserToken redisToken = userTokenRepository.findById(appUser.getId())
+                .orElseThrow(() -> new IllegalArgumentException("No token found for the provided email: " + email));
+
+        return (email.equals(userDetails.getUsername())
+                && !isTokenExpired(token)
+                && (redisToken.getToken().equals(token)));
     }
 
     boolean isTokenExpired(String token) throws ExpiredJwtException {
@@ -103,31 +100,42 @@ public class JwtService {
 
     }
 
-    public void saveTokenInRedis(String email, String token) {
+    public void saveTokenInRedis(UUID userId, String email, String token) {
         long expirationTimeInSeconds = 3600;
         JSONObject json = new JSONObject();
         json.put("email", email);
         json.put("token", token);
         json.put("expirationTimeInSeconds", expirationTimeInSeconds);
-        jedis.set(email, json.toString());
+
+        UserToken userToken = UserToken.builder().userId(userId).email(email).token(token).build();
+
+        userTokenRepository.save(userToken);
+        // jedis.set(email, json.toString());
     }
 
     public boolean isTokenInRedis(String email) {
-        return jedis.exists(email);
+        System.out.println("CHECKING FOR TOKEN");
+        return userTokenRepository.existsByEmail(email);
     }
 
-    public boolean setExpiryDate(String email, long seconds) {
-        try {
-            String tokenData = jedis.get(email);
-            if (tokenData != null) {
-                jedis.expire(email, seconds);
-                return true;
-            } else {
-                throw new IllegalArgumentException("No token found for the provided email: " + email);
-            }
-        } catch (Exception e) {
-            throw new IllegalArgumentException("No token found for the provided email: " + email);
-        }
-
+    public void expire(UUID userId) {
+        userTokenRepository.deleteById(userId);
     }
+
+    // public boolean setExpiryDate(String email, long seconds) {
+    // try {
+    // String tokenData = jedis.get(email);
+    // if (tokenData != null) {
+    // jedis.expire(email, seconds);
+    // return true;
+    // } else {
+    // throw new IllegalArgumentException("No token found for the provided email: "
+    // + email);
+    // }
+    // } catch (Exception e) {
+    // throw new IllegalArgumentException("No token found for the provided email: "
+    // + email);
+    // }
+
+    // }
 }

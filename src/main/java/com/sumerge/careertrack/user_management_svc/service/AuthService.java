@@ -85,13 +85,13 @@ public class AuthService {
 						DoesNotExistException.APP_USER_EMAIL, request.getEmail()));
 
 		String jwtToken = jwtService.generateToken(user);
-		jwtService.saveTokenInRedis(request.getEmail(), jwtToken);
+		jwtService.saveTokenInRedis(user.getId(), request.getEmail(), jwtToken);
 		return new AuthenticationResponse(jwtToken);
 
 	}
 
-	public boolean logout(String email) {
-		jwtService.setExpiryDate(email, 0);
+	public boolean logout(UUID userId) {
+		jwtService.expire(userId);
 		return true;
 	}
 
