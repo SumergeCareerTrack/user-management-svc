@@ -36,6 +36,12 @@ public class AppUserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/batch")
+    public ResponseEntity<List<AppUserResponseDTO>> getBatch(@RequestBody List<UUID> ids) {
+        List<AppUserResponseDTO> users = userService.getBatch(ids);
+        return ResponseEntity.ok(users);
+    }
+
     @GetMapping("/managers") // TODO review naming
     public ResponseEntity<List<AppUserResponseDTO>> getManagersByDept(@RequestParam String departmentName) {
         List<AppUserResponseDTO> users = userService.getManagersByDept(departmentName);
