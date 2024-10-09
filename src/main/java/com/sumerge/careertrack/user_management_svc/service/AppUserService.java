@@ -159,4 +159,5 @@ public class AppUserService {
         AppUser updatedUser = userRepository.save(user);
         return userMapper.toResponseDTO(updatedUser);
     }
+    
 }
