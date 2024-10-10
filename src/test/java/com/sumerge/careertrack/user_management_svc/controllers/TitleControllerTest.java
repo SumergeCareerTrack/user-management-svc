@@ -153,7 +153,7 @@ class TitleControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(expectedUUID.toString()))
-                .andExpect(jsonPath("$.titleName").value(titleName));
+                .andExpect(jsonPath("$.name").value(titleName));
 
         verify(titleService, times(1)).findByDepartmentAndTitle(deptName, titleName);
     }
