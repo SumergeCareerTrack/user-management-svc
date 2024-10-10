@@ -117,8 +117,8 @@ class TitleServiceTest {
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        assertEquals("Software Engineer", result.get(0).getTitleName());
-        assertEquals("Senior Engineer", result.get(1).getTitleName());
+        assertEquals("Software Engineer", result.get(0).getName());
+        assertEquals("Senior Engineer", result.get(1).getName());
 
         verify(titleRepository).findByDepartmentName(departmentName);
         verify(titleMapper).toDTO(title1);
@@ -152,7 +152,7 @@ class TitleServiceTest {
         savedTitle.setDepartment(department);
 
         TitleResponseDTO responseDTO = new TitleResponseDTO();
-        responseDTO.setTitleName("New Title");
+        responseDTO.setName("New Title");
 
         // Mock behavior
         when(titleMapper.toTitle(requestDTO)).thenReturn(title);
@@ -165,7 +165,7 @@ class TitleServiceTest {
         TitleResponseDTO result = titleService.createTitle(requestDTO);
 
         assertNotNull(result);
-        assertEquals("New Title", result.getTitleName());
+        assertEquals("New Title", result.getName());
         verify(departmentRepository, times(1)).findById(requestDTO.getDepartmentId());
         verify(titleRepository, times(1)).existsByNameAndDepartmentName(requestDTO.getName(), department.getName());
         verify(titleRepository, times(1)).save(title);
@@ -252,7 +252,7 @@ class TitleServiceTest {
         title.setName(titleName);
 
         TitleResponseDTO responseDTO = new TitleResponseDTO();
-        responseDTO.setTitleName(titleName);
+        responseDTO.setName(titleName);
 
         when(titleRepository.findByNameAndDepartmentName(titleName, departmentName))
                 .thenReturn(Optional.of(title));
@@ -261,7 +261,7 @@ class TitleServiceTest {
         TitleResponseDTO result = titleService.findByDepartmentAndTitle(departmentName, titleName);
 
         assertNotNull(result);
-        assertEquals(titleName, result.getTitleName());
+        assertEquals(titleName, result.getName());
         verify(titleRepository, times(1)).findByNameAndDepartmentName(titleName, departmentName);
         verify(titleMapper, times(1)).toDTO(title);
     }

@@ -145,7 +145,7 @@ class TitleControllerTest {
         TitleResponseDTO titleResponseDTO = new TitleResponseDTO();
         UUID expectedUUID = UUID.randomUUID();
         titleResponseDTO.setId(expectedUUID);
-        titleResponseDTO.setTitleName(titleName);
+        titleResponseDTO.setName(titleName);
         when(titleService.findByDepartmentAndTitle(deptName, titleName))
                 .thenReturn(titleResponseDTO);
 
