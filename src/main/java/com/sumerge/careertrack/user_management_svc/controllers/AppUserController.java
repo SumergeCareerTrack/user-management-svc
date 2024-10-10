@@ -6,16 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserResponseDTO;
@@ -78,6 +69,13 @@ public class AppUserController {
         AppUserResponseDTO updatedUser = userService.updateUser(updatedDTO);
         return ResponseEntity.ok(updatedUser);
     }
+    //TODO DO ITS TESTS
+    @PutMapping("/password/{userId}")
+    public ResponseEntity<AppUserResponseDTO> changePassword(@RequestBody String password,@PathVariable String userId) {
+        AppUserResponseDTO updatedUser = userService.changePassword(password, userId);
+        return ResponseEntity.ok(updatedUser);
+    }
+
 
     /* DELETE METHODS */
     @DeleteMapping("/{userId}")
