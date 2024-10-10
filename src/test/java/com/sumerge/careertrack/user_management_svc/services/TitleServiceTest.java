@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.service;
+package com.sumerge.careertrack.user_management_svc.services;
 
 import com.sumerge.careertrack.user_management_svc.entities.Department;
 import com.sumerge.careertrack.user_management_svc.entities.Title;
@@ -7,6 +7,8 @@ import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistExcept
 import com.sumerge.careertrack.user_management_svc.mappers.*;
 import com.sumerge.careertrack.user_management_svc.repositories.DepartmentRepository;
 import com.sumerge.careertrack.user_management_svc.repositories.TitleRepository;
+import com.sumerge.careertrack.user_management_svc.services.TitleService;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,11 +40,11 @@ class TitleServiceTest {
     private TitleService titleService;
 
     @Test
-    void getAllTitles_Successful(){
+    void getAllTitles_Successful() {
         Title title1 = new Title();
         Title title2 = new Title();
 
-        List<Title> expectedTitles = Arrays.asList(title1,title2);
+        List<Title> expectedTitles = Arrays.asList(title1, title2);
 
         when(titleRepository.findAll()).thenReturn(expectedTitles);
         List<TitleResponseDTO> receivedTitles = titleService.getAllTitles();
@@ -57,7 +59,7 @@ class TitleServiceTest {
     }
 
     @Test
-    void getAllTitles_Not_Successful(){
+    void getAllTitles_Not_Successful() {
         when(titleRepository.findAll()).thenReturn(Collections.emptyList());
         List<TitleResponseDTO> receivedTitles = titleService.getAllTitles();
         assertEquals(receivedTitles.size(), 0);
@@ -65,11 +67,11 @@ class TitleServiceTest {
     }
 
     @Test
-    void getAllDepartments_Successful(){
+    void getAllDepartments_Successful() {
         Department dept1 = new Department();
         Department dept2 = new Department();
 
-        List<Department> expectedDepartments = Arrays.asList(dept1,dept2);
+        List<Department> expectedDepartments = Arrays.asList(dept1, dept2);
 
         when(departmentRepository.findAll()).thenReturn(expectedDepartments);
         List<DepartmentResponseDTO> receivedDepartments = titleService.getAllDepartments();
@@ -84,7 +86,7 @@ class TitleServiceTest {
     }
 
     @Test
-    void getAllDepartments_Not_Successful(){
+    void getAllDepartments_Not_Successful() {
         when(departmentRepository.findAll()).thenReturn(Collections.emptyList());
         List<DepartmentResponseDTO> receivedDepartments = titleService.getAllDepartments();
         assertEquals(receivedDepartments.size(), 0);
@@ -96,16 +98,17 @@ class TitleServiceTest {
         String departmentName = "Engineering";
         Department department = Department.builder().name(departmentName).build();
 
-        Title title1 = Title.builder().id(UUID.randomUUID()).department(department).name("Software Engineer").isManager(false).build();
-        Title title2 = Title.builder().id(UUID.randomUUID()).department(department).name("Senior Engineer").isManager(true).build();
+        Title title1 = Title.builder().id(UUID.randomUUID()).department(department).name("Software Engineer")
+                .isManager(false).build();
+        Title title2 = Title.builder().id(UUID.randomUUID()).department(department).name("Senior Engineer")
+                .isManager(true).build();
 
         List<Title> titles = Arrays.asList(title1, title2);
 
         when(titleRepository.findByDepartmentName(departmentName)).thenReturn(titles);
 
-
-        TitleResponseDTO dto1 = new TitleResponseDTO(UUID.randomUUID(), UUID.randomUUID(),"Software Engineer", false);
-        TitleResponseDTO dto2 = new TitleResponseDTO(UUID.randomUUID(), UUID.randomUUID(),"Senior Engineer", true);
+        TitleResponseDTO dto1 = new TitleResponseDTO(UUID.randomUUID(), UUID.randomUUID(), "Software Engineer", false);
+        TitleResponseDTO dto2 = new TitleResponseDTO(UUID.randomUUID(), UUID.randomUUID(), "Senior Engineer", true);
 
         when(titleMapper.toDTO(title1)).thenReturn(dto1);
         when(titleMapper.toDTO(title2)).thenReturn(dto2);
@@ -123,7 +126,7 @@ class TitleServiceTest {
     }
 
     @Test
-    void findByDept_Not_Successful(){
+    void findByDept_Not_Successful() {
         String departmentName = "Not Engineering";
         when(titleRepository.findByDepartmentName(departmentName)).thenReturn(Collections.emptyList());
         List<TitleResponseDTO> receivedTitles = titleService.findByDept(departmentName);
@@ -154,7 +157,8 @@ class TitleServiceTest {
         // Mock behavior
         when(titleMapper.toTitle(requestDTO)).thenReturn(title);
         when(departmentRepository.findById(requestDTO.getDepartmentId())).thenReturn(Optional.of(department));
-        when(titleRepository.existsByNameAndDepartmentName(requestDTO.getName(), department.getName())).thenReturn(false);
+        when(titleRepository.existsByNameAndDepartmentName(requestDTO.getName(), department.getName()))
+                .thenReturn(false);
         when(titleRepository.save(title)).thenReturn(savedTitle);
         when(titleMapper.toDTO(savedTitle)).thenReturn(responseDTO);
 
@@ -167,8 +171,9 @@ class TitleServiceTest {
         verify(titleRepository, times(1)).save(title);
 
     }
+
     @Test
-     void createTitle_Not_Successful_DepartmentNotFound() {
+    void createTitle_Not_Successful_DepartmentNotFound() {
         TitleRequestDTO requestDTO = new TitleRequestDTO();
         UUID departmentId = UUID.randomUUID();
         requestDTO.setDepartmentId(departmentId);
@@ -191,7 +196,8 @@ class TitleServiceTest {
         department.setName("HR");
 
         when(departmentRepository.findById(departmentId)).thenReturn(Optional.of(department));
-        when(titleRepository.existsByNameAndDepartmentName(requestDTO.getName(), department.getName())).thenReturn(true);
+        when(titleRepository.existsByNameAndDepartmentName(requestDTO.getName(), department.getName()))
+                .thenReturn(true);
 
         assertThrows(AlreadyExistsException.class, () -> titleService.createTitle(requestDTO));
 
@@ -268,8 +274,8 @@ class TitleServiceTest {
         when(titleRepository.findByNameAndDepartmentName(titleName, departmentName))
                 .thenReturn(Optional.empty());
 
-        assertThrows(DoesNotExistException.class, () ->
-                titleService.findByDepartmentAndTitle(departmentName, titleName));
+        assertThrows(DoesNotExistException.class,
+                () -> titleService.findByDepartmentAndTitle(departmentName, titleName));
 
         verify(titleRepository, times(1)).findByNameAndDepartmentName(titleName, departmentName);
         verify(titleMapper, times(0)).toDTO(any());
@@ -283,7 +289,7 @@ class TitleServiceTest {
         Title title = new Title();
         title.setName(titleName);
         when(titleRepository.findByNameAndDepartmentName(titleName, departmentName))
-        .thenReturn(Optional.of(title));
+                .thenReturn(Optional.of(title));
 
         titleService.deleteTitle(departmentName, titleName);
 
@@ -299,8 +305,8 @@ class TitleServiceTest {
         when(titleRepository.findByNameAndDepartmentName(titleName, departmentName))
                 .thenReturn(Optional.empty());
 
-        assertThrows(DoesNotExistException.class, () ->
-                titleService.findByDepartmentAndTitle(departmentName, titleName));
+        assertThrows(DoesNotExistException.class,
+                () -> titleService.findByDepartmentAndTitle(departmentName, titleName));
 
         verify(titleRepository, times(1)).findByNameAndDepartmentName(titleName, departmentName);
     }

@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.service;
+package com.sumerge.careertrack.user_management_svc.services;
 
 import com.sumerge.careertrack.user_management_svc.entities.AppUser;
 import com.sumerge.careertrack.user_management_svc.entities.Department;
@@ -12,6 +12,9 @@ import com.sumerge.careertrack.user_management_svc.exceptions.InvalidCredentials
 import com.sumerge.careertrack.user_management_svc.repositories.AppUserRepository;
 import com.sumerge.careertrack.user_management_svc.repositories.DepartmentRepository;
 import com.sumerge.careertrack.user_management_svc.repositories.TitleRepository;
+import com.sumerge.careertrack.user_management_svc.services.AuthService;
+import com.sumerge.careertrack.user_management_svc.services.JwtService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

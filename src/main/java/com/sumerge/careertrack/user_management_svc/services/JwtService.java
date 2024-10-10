@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.service;
+package com.sumerge.careertrack.user_management_svc.services;
 
 import java.security.Key;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.controller;
+package com.sumerge.careertrack.user_management_svc.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -34,12 +34,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sumerge.careertrack.user_management_svc.controllers.AppUserController;
 import com.sumerge.careertrack.user_management_svc.entities.Department;
 import com.sumerge.careertrack.user_management_svc.entities.Title;
 import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserResponseDTO;
-import com.sumerge.careertrack.user_management_svc.service.AppUserService;
+import com.sumerge.careertrack.user_management_svc.services.AppUserService;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)

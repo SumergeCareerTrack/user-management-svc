@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.controller;
+package com.sumerge.careertrack.user_management_svc.controllers;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserResponseDTO;
-import com.sumerge.careertrack.user_management_svc.service.AppUserService;
+import com.sumerge.careertrack.user_management_svc.services.AppUserService;
 
 @CrossOrigin
 @RestController

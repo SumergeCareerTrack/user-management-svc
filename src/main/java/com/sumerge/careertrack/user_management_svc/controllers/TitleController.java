@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.controller;
+package com.sumerge.careertrack.user_management_svc.controllers;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import com.sumerge.careertrack.user_management_svc.mappers.DepartmentRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.DepartmentResponseDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleResponseDTO;
-import com.sumerge.careertrack.user_management_svc.service.TitleService;
+import com.sumerge.careertrack.user_management_svc.services.TitleService;
 
 @CrossOrigin
 @RestController

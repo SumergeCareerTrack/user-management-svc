@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.controller;
+package com.sumerge.careertrack.user_management_svc.controllers;
 
 import java.util.UUID;
 
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.sumerge.careertrack.user_management_svc.entities.requests.AuthenticationRequest;
 import com.sumerge.careertrack.user_management_svc.entities.requests.RegisterRequest;
 import com.sumerge.careertrack.user_management_svc.entities.responses.AuthenticationResponse;
-import com.sumerge.careertrack.user_management_svc.service.AuthService;
+import com.sumerge.careertrack.user_management_svc.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
 

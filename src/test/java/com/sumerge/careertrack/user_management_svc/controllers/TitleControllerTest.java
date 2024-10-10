@@ -1,13 +1,15 @@
-package com.sumerge.careertrack.user_management_svc.controller;
+package com.sumerge.careertrack.user_management_svc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sumerge.careertrack.user_management_svc.controllers.TitleController;
 import com.sumerge.careertrack.user_management_svc.exceptions.AlreadyExistsException;
 import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
 import com.sumerge.careertrack.user_management_svc.mappers.DepartmentRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.DepartmentResponseDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.TitleResponseDTO;
-import com.sumerge.careertrack.user_management_svc.service.TitleService;
+import com.sumerge.careertrack.user_management_svc.services.TitleService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -30,8 +32,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = TitleController.class,
-        excludeAutoConfiguration = SecurityAutoConfiguration.class)
+@WebMvcTest(controllers = TitleController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ContextConfiguration(classes = TitleController.class)
 @ComponentScan("com.sumerge.careertrack.user_management_svc.exceptions")
@@ -60,7 +61,7 @@ class TitleControllerTest {
         titles.add(titleResponseDTO);
         when(titleService.getAllTitles()).thenReturn(titles);
         mockMvc.perform(get("/titles/")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(expectedUUID.toString()));
@@ -72,10 +73,10 @@ class TitleControllerTest {
         List<TitleResponseDTO> titles = new ArrayList<>();
         when(titleService.getAllTitles()).thenReturn(titles);
         mockMvc.perform(get("/titles/")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
-            verify(titleService, times(1)).getAllTitles();
+        verify(titleService, times(1)).getAllTitles();
     }
 
     @Test
@@ -87,7 +88,7 @@ class TitleControllerTest {
         deps.add(departmentResponseDTO);
         when(titleService.getAllDepartments()).thenReturn(deps);
         mockMvc.perform(get("/titles/departments")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").value(expectedUUID.toString()));
@@ -99,7 +100,7 @@ class TitleControllerTest {
         List<DepartmentResponseDTO> deps = new ArrayList<>();
         when(titleService.getAllDepartments()).thenReturn(deps);
         mockMvc.perform(get("/titles/departments")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
         verify(titleService, times(1)).getAllDepartments();
@@ -115,7 +116,7 @@ class TitleControllerTest {
         List<TitleResponseDTO> titles = new ArrayList<>();
         titles.add(titleResponseDTO);
         when(titleService.findByDept(deptName)).thenReturn(titles);
-        mockMvc.perform(get("/titles/{deptName}",deptName)
+        mockMvc.perform(get("/titles/{deptName}", deptName)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -129,8 +130,8 @@ class TitleControllerTest {
         String deptName = "HR";
         List<TitleResponseDTO> titles = new ArrayList<>();
         when(titleService.findByDept(deptName)).thenReturn(titles);
-        mockMvc.perform(get("/titles/{deptName}",deptName)
-                        .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/titles/{deptName}", deptName)
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
 
@@ -145,16 +146,16 @@ class TitleControllerTest {
         UUID expectedUUID = UUID.randomUUID();
         titleResponseDTO.setId(expectedUUID);
         titleResponseDTO.setTitleName(titleName);
-        when(titleService.findByDepartmentAndTitle(deptName,titleName))
+        when(titleService.findByDepartmentAndTitle(deptName, titleName))
                 .thenReturn(titleResponseDTO);
 
-        mockMvc.perform(get("/titles/{deptName}/{titleName}",deptName,titleName)
+        mockMvc.perform(get("/titles/{deptName}/{titleName}", deptName, titleName)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(expectedUUID.toString()))
                 .andExpect(jsonPath("$.titleName").value(titleName));
 
-        verify(titleService, times(1)).findByDepartmentAndTitle(deptName,titleName);
+        verify(titleService, times(1)).findByDepartmentAndTitle(deptName, titleName);
     }
 
     @Test
@@ -162,12 +163,12 @@ class TitleControllerTest {
         String deptName = "HR";
         String titleName = "Hr Manager";
 
-        when(titleService.findByDepartmentAndTitle(deptName,titleName)).thenThrow(DoesNotExistException.class);
-        mockMvc.perform(get("/titles/{deptName}/{titleName}",deptName,titleName)
+        when(titleService.findByDepartmentAndTitle(deptName, titleName)).thenThrow(DoesNotExistException.class);
+        mockMvc.perform(get("/titles/{deptName}/{titleName}", deptName, titleName)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        verify(titleService, times(1)).findByDepartmentAndTitle(deptName,titleName);
+        verify(titleService, times(1)).findByDepartmentAndTitle(deptName, titleName);
 
     }
 
@@ -198,9 +199,9 @@ class TitleControllerTest {
         when(titleService.createTitle(titleRequestDTO)).thenThrow(DoesNotExistException.class);
 
         mockMvc.perform(post("/titles/newTitle")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(titleRequestDTO)))
-                        .andExpect(status().isBadRequest());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(titleRequestDTO)))
+                .andExpect(status().isBadRequest());
 
         verify(titleService, times(1)).createTitle(titleRequestDTO);
     }
@@ -215,8 +216,8 @@ class TitleControllerTest {
         when(titleService.createTitle(titleRequestDTO)).thenThrow(AlreadyExistsException.class);
 
         mockMvc.perform(post("/titles/newTitle")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(titleRequestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(titleRequestDTO)))
                 .andExpect(status().isBadRequest());
 
         verify(titleService, times(1)).createTitle(titleRequestDTO);
@@ -231,8 +232,8 @@ class TitleControllerTest {
 
         when(titleService.createDepartment(any(DepartmentRequestDTO.class))).thenReturn(departmentResponseDTO);
         mockMvc.perform(post("/titles/newDepartment")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(departmentRequestDTO)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(departmentRequestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(expectedUUID.toString()));
         verify(titleService, times(1)).createDepartment(any(DepartmentRequestDTO.class));
@@ -248,25 +249,24 @@ class TitleControllerTest {
         when(titleService.createDepartment(any(DepartmentRequestDTO.class)))
                 .thenThrow(AlreadyExistsException.class);
         mockMvc.perform(post("/titles/newDepartment")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(departmentRequestDTO)))
-                        .andExpect(status().isBadRequest());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(departmentRequestDTO)))
+                .andExpect(status().isBadRequest());
         verify(titleService, times(1)).createDepartment(any(DepartmentRequestDTO.class));
     }
-
 
     @Test
     void deleteTitle_Successful() throws Exception {
         String deptName = "HR";
         String titleName = "Hr Manager";
 
-        doNothing().when(titleService).deleteTitle(deptName,titleName);
+        doNothing().when(titleService).deleteTitle(deptName, titleName);
 
         mockMvc.perform(delete("/titles/{deptName}/{titleName}", deptName, titleName)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(titleService , times(1)).deleteTitle(deptName , titleName);
+        verify(titleService, times(1)).deleteTitle(deptName, titleName);
     }
 
     @Test
@@ -277,9 +277,9 @@ class TitleControllerTest {
         when(titleService.findByDepartmentAndTitle(titleName, deptName)).thenThrow(DoesNotExistException.class);
 
         mockMvc.perform(delete("/titles/{deptName}/{titleName}", deptName, titleName)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(titleService , times(1)).deleteTitle(deptName , titleName);
+        verify(titleService, times(1)).deleteTitle(deptName, titleName);
     }
 }

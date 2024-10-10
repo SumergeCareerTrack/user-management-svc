@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.service;
+package com.sumerge.careertrack.user_management_svc.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -15,6 +15,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import com.sumerge.careertrack.user_management_svc.services.JwtService;
+
 import redis.clients.jedis.Jedis;
 
 import java.util.Date;

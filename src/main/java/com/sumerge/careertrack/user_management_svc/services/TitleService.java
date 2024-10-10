@@ -1,4 +1,4 @@
-package com.sumerge.careertrack.user_management_svc.service;
+package com.sumerge.careertrack.user_management_svc.services;
 
 import java.util.List;
 import java.util.stream.Collectors;
