@@ -16,7 +16,7 @@ public class TitleResponseDTO {
 
     private UUID departmentId;
 
-    private String titleName;
+    private String name;
 
     private boolean isManager;
 }

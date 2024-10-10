@@ -15,7 +15,7 @@ public interface TitleMapper {
 
     @Mapping(target = "departmentId", source = "department.id")
     @Mapping(target = "isManager", source = "manager")
-    @Mapping(target = "titleName", source = "name")
+    @Mapping(target = "name", source = "name")
     TitleResponseDTO toDTO(Title title);
 
 }
