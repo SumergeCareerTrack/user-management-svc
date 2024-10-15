@@ -27,7 +27,7 @@ public class AppUserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/batch")
+    @PostMapping("/batch")
     public ResponseEntity<List<AppUserResponseDTO>> getBatch(@RequestBody List<UUID> ids) {
         List<AppUserResponseDTO> users = userService.getBatch(ids);
         return ResponseEntity.ok(users);
@@ -69,13 +69,14 @@ public class AppUserController {
         AppUserResponseDTO updatedUser = userService.updateUser(updatedDTO);
         return ResponseEntity.ok(updatedUser);
     }
-    //TODO DO ITS TESTS
+
+    // TODO DO ITS TESTS
     @PutMapping("/password/{userId}")
-    public ResponseEntity<AppUserResponseDTO> changePassword(@RequestBody String password,@PathVariable String userId) {
+    public ResponseEntity<AppUserResponseDTO> changePassword(@RequestBody String password,
+            @PathVariable String userId) {
         AppUserResponseDTO updatedUser = userService.changePassword(password, userId);
         return ResponseEntity.ok(updatedUser);
     }
-
 
     /* DELETE METHODS */
     @DeleteMapping("/{userId}")
