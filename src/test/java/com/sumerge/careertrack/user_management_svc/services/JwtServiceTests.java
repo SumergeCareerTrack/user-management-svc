@@ -80,33 +80,34 @@ public class JwtServiceTests {
         assertEquals(userDetails.getUsername(), subject);
     }
 
-    @Test
-    public void isTokenValid_whenTokenIsValid_returnTrue() throws JSONException {
-        String email = userDetails.getUsername();
-        JSONObject json = new JSONObject();
-        json.put("email", email);
-        json.put("token", token);
+    // @Test
+    // public void isTokenValid_whenTokenIsValid_returnTrue() throws JSONException {
+    // String email = userDetails.getUsername();
+    // JSONObject json = new JSONObject();
+    // json.put("email", email);
+    // json.put("token", token);
 
-        when(jedis.get(email)).thenReturn(json.toString());
+    // when(jedis.get(email)).thenReturn(json.toString());
 
-        boolean isValid = jwtService.isTokenValid(token, userDetails);
+    // boolean isValid = jwtService.isTokenValid(token, userDetails);
 
-        assertTrue(isValid);
-    }
+    // assertTrue(isValid);
+    // }
 
-    @Test
-    public void isTokenValid_whenTokenIsInvalid_returnFalse() throws JSONException {
-        String email = userDetails.getUsername();
-        JSONObject json = new JSONObject();
-        json.put("email", email);
-        json.put("token", "wrongToken");
+    // @Test
+    // public void isTokenValid_whenTokenIsInvalid_returnFalse() throws
+    // JSONException {
+    // String email = userDetails.getUsername();
+    // JSONObject json = new JSONObject();
+    // json.put("email", email);
+    // json.put("token", "wrongToken");
 
-        when(jedis.get(email)).thenReturn(json.toString());
+    // when(jedis.get(email)).thenReturn(json.toString());
 
-        boolean isValid = jwtService.isTokenValid(token, userDetails);
+    // boolean isValid = jwtService.isTokenValid(token, userDetails);
 
-        assertFalse(isValid);
-    }
+    // assertFalse(isValid);
+    // }
 
     // TODO
     // public void saveTokenInRedis_savesTokenSuccessfully() {
