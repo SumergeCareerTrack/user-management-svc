@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +25,13 @@ public class AppUserController {
 
     /* GET METHODS */
     @GetMapping("/")
-    public ResponseEntity<List<AppUserResponseDTO>> getAll() {
-        List<AppUserResponseDTO> users = userService.getAll();
+    public ResponseEntity<List<AppUserResponseDTO>> getAll(@RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AppUserResponseDTO> usersPage = userService.getAll(pageable);
+
+        List<AppUserResponseDTO> users = usersPage.getContent();
+
         return ResponseEntity.ok(users);
     }
 
