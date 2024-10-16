@@ -35,6 +35,13 @@ public class TitleController {
             return ResponseEntity.ok(titles);
         }
     }
+    @GetMapping("/title/{titleId}")
+    public ResponseEntity<TitleResponseDTO> getTitleById(
+            @PathVariable String titleId
+    ) {
+        TitleResponseDTO depts = titleService.getTitleById(titleId);
+        return ResponseEntity.ok(depts);
+    }
 
     @GetMapping("/departments")
     public ResponseEntity<List<DepartmentResponseDTO>> getAllDepartments() {

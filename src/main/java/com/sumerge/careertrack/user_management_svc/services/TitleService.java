@@ -1,6 +1,7 @@
 package com.sumerge.careertrack.user_management_svc.services;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,11 @@ public class TitleService {
     public Page<TitleResponseDTO> getAllTitles(Pageable pageable) {
         Page<Title> titles = titleRepository.findAll(pageable);
         return titles.map(titleMapper::toDTO);
+    }
+    public TitleResponseDTO getTitleById(String id){
+        Title title = titleRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new DoesNotExistException(DoesNotExistException.TITLE, id));
+        return titleMapper.toDTO(title);
     }
 
     public List<DepartmentResponseDTO> getAllDepartments() {
