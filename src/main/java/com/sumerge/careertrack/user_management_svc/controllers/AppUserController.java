@@ -25,14 +25,19 @@ public class AppUserController {
 
     /* GET METHODS */
     @GetMapping("/")
-    public ResponseEntity<List<AppUserResponseDTO>> getAll(@RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<AppUserResponseDTO> usersPage = userService.getAll(pageable);
+    public ResponseEntity<List<AppUserResponseDTO>> getAll(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
 
-        List<AppUserResponseDTO> users = usersPage.getContent();
-
-        return ResponseEntity.ok(users);
+        if (page == null || size == null || size == 0) {
+            List<AppUserResponseDTO> allUsers = userService.getAll();
+            return ResponseEntity.ok(allUsers);
+        } else {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<AppUserResponseDTO> usersPage = userService.getAll(pageable);
+            List<AppUserResponseDTO> users = usersPage.getContent();
+            return ResponseEntity.ok(users);
+        }
     }
 
     @GetMapping("/batch")

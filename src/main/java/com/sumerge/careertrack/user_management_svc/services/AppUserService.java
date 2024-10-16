@@ -39,6 +39,10 @@ public class AppUserService {
     private  PasswordEncoder passwordEncoder;
 
 
+    public List<AppUserResponseDTO> getAll() {
+        List<AppUser> users = userRepository.findAll();
+        return users.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
+    }
     public Page<AppUserResponseDTO> getAll(Pageable pageable) {
         Page<AppUser> usersPage = userRepository.findAll(pageable);
         return usersPage.map(userMapper::toResponseDTO);
