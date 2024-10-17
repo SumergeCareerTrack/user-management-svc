@@ -25,6 +25,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.UUID;
 
@@ -32,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -82,41 +84,48 @@ public class AuthControllerTests {
                 setUpAttributes(department, titleManager, titleEmployee);
 
         }
-
+        public AppUser setUpManager(Department department, Title titleManager){
+                return AppUser.builder()
+                        .id(UUID.randomUUID())
+                        .email("manager@manager.com")
+                        .password("test123")
+                        .firstName("Andrew")
+                        .lastName("Smith")
+                        .manager(null)
+                        .department(department)
+                        .title(titleManager)
+                        .build();
+        }
+        public AppUser setUpUser(Department department, Title titleEmployee){
+                return AppUser.builder()
+                        .id(UUID.randomUUID())
+                        .email("test@test.com")
+                        .password("test123")
+                        .firstName("Andrew")
+                        .lastName("Smith")
+                        .manager(managerUser)
+                        .department(department)
+                        .title(titleEmployee)
+                        .build();
+        }
+        public RegisterRequest setUpRegisterReq(AppUser testUser){
+                return new RegisterRequest(
+                        testUser.getEmail(),
+                        testUser.getPassword(),
+                        testUser.getFirstName(),
+                        testUser.getLastName(),
+                        testUser.getDepartment().getId(),
+                        testUser.getTitle().getId(),
+                        testUser.getManager().getId());
+        }
         public void setUpAttributes(Department department, Title titleManager, Title titleEmployee) {
-                this.managerUser = AppUser.builder()
-                                .id(UUID.randomUUID())
-                                .email("manager@manager.com")
-                                .password("test123")
-                                .firstName("Andrew")
-                                .lastName("Smith")
-                                .manager(null)
-                                .department(department)
-                                .title(titleManager)
-                                .build();
-
-                this.testUser = AppUser.builder()
-                                .id(UUID.randomUUID())
-                                .email("test@test.com")
-                                .password("test123")
-                                .firstName("Andrew")
-                                .lastName("Smith")
-                                .manager(managerUser)
-                                .department(department)
-                                .title(titleEmployee)
-                                .build();
-                registerRequest = new RegisterRequest(
-                                testUser.getEmail(),
-                                testUser.getPassword(),
-                                testUser.getFirstName(),
-                                testUser.getLastName(),
-                                testUser.getDepartment().getId(),
-                                testUser.getTitle().getId(),
-                                testUser.getManager().getId());
+                this.managerUser = setUpManager(department, titleManager);
+                this.testUser = setUpUser(department, titleEmployee);
+                registerRequest = setUpRegisterReq(this.testUser);
         }
 
-        // TODO 01: Ask others if we have to add DoesNotExist Exception on Department
-        // and Title
+
+
         @Test
         public void register_CorrectRequest_ReturnsAuthenticationResponse() throws Exception {
                 String jwtToken = "Test";
@@ -131,7 +140,7 @@ public class AuthControllerTests {
 
                 response.andExpect(status().isOk())
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(content().json("{\"token\":\"Test\"}"));
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.token").value(jwtToken));
         }
 
         @Test
@@ -212,7 +221,7 @@ public class AuthControllerTests {
 
                 response.andExpect(status().isOk())
                                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(content().json("{\"token\":\"Test\"}"));
+                        .andExpect(MockMvcResultMatchers.jsonPath("$.token").value(jwtToken));
         }
 
         /*
@@ -252,12 +261,10 @@ public class AuthControllerTests {
                                 .andExpect(content().string((InvalidCredentialsException.DEFAULT)));
         }
 
-        // @Test
-        // public void logout_ValidRequest_ReturnsOk() throws Exception {
-        // ResultActions response = mockMvc.perform(post("/auth/logout/{email}",
-        // this.testUser.getEmail())
-        // .header("Authorization", "Bearer TOKEN")
-        // .contentType(MediaType.APPLICATION_JSON));
-        // response.andExpect(status().isOk());
-        // }
+        @Test
+        public void logout_Success_NoContentResponse() throws Exception {
+                UUID userId = UUID.randomUUID();
+                mockMvc.perform(post("/auth/logout/" + userId))
+                        .andExpect(status().isOk());
+        }
 }

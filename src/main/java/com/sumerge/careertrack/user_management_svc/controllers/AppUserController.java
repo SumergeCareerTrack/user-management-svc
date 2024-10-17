@@ -58,7 +58,7 @@ public class AppUserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/email/{email}") // TODO Review RequestBody vs PathVariable
+    @GetMapping("/email/{email}")
     public ResponseEntity<AppUserResponseDTO> getByEmail(@PathVariable String email) {
         AppUserResponseDTO user = userService.getByEmail(email);
         return ResponseEntity.ok(user);
