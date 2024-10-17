@@ -47,7 +47,7 @@ public class TitleService {
     }
     public TitleResponseDTO getTitleById(String id){
         Title title = titleRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new DoesNotExistException(DoesNotExistException.TITLE, id));
+                .orElseThrow(() -> new DoesNotExistException(DoesNotExistException.TITLE_BY_ID, id));
         return titleMapper.toDTO(title);
     }
 
