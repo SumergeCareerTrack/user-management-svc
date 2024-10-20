@@ -33,8 +33,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTests {
@@ -60,60 +59,58 @@ public class AuthServiceTests {
         private AppUser testUser;
         private AuthenticationRequest authRequest;
 
-        public void setUpAttributes(Department department, Title titleManager, Title titleEmployee) {
-                this.managerUser = AppUser.builder()
-                                .id(UUID.randomUUID())
-                                .email("manager@manager.com")
-                                .password("test123")
-                                .firstName("Andrew")
-                                .lastName("Smith")
-                                .manager(null)
-                                .department(department)
-                                .title(titleManager)
-                                .build();
-
-                this.testUser = AppUser.builder()
-                                .id(UUID.randomUUID())
-                                .email("test@test.com")
-                                .password("password")
-                                .firstName("Andrew")
-                                .lastName("Smith")
-                                .manager(managerUser)
-                                .department(department)
-                                .title(titleEmployee)
-                                .build();
-                registerRequest = new RegisterRequest(
-                                testUser.getEmail(),
-                                testUser.getPassword(),
-                                testUser.getFirstName(),
-                                testUser.getLastName(),
-                                testUser.getDepartment().getId(),
-                                testUser.getTitle().getId(),
-                                testUser.getManager().getId());
-        }
-
         @BeforeEach
         public void setUp() {
                 this.authRequest = new AuthenticationRequest("test@test.com", "password");
 
-                Department department = Department.builder()
-                                .id(UUID.randomUUID())
-                                .name("HR")
-                                .build();
-
-                Title titleEmployee = Title.builder()
-                                .id(UUID.randomUUID())
-                                .name("Employee")
-                                .isManager(false)
-                                .build();
-
-                Title titleManager = Title.builder()
-                                .id(UUID.randomUUID())
-                                .name("Manager")
-                                .isManager(true)
-                                .build();
+                Department department = createDepartment("HR");
+                Title titleManager = createTitle("Manager", true);
+                Title titleEmployee = createTitle("Employee", false);
 
                 setUpAttributes(department, titleManager, titleEmployee);
+        }
+
+        private void setUpAttributes(Department department, Title titleManager, Title titleEmployee) {
+                this.managerUser = createUser("manager@manager.com", "test123", titleManager, department, null);
+                this.testUser = createUser("test@test.com", "password", titleEmployee, department, managerUser);
+
+                this.registerRequest = new RegisterRequest(
+                        testUser.getEmail(),
+                        testUser.getPassword(),
+                        testUser.getFirstName(),
+                        testUser.getLastName(),
+                        testUser.getDepartment().getId(),
+                        testUser.getTitle().getId(),
+                        testUser.getManager() != null ? testUser.getManager().getId() : null // Handle null manager
+                );
+        }
+
+        private AppUser createUser(String email, String password, Title title, Department department, AppUser manager) {
+                return AppUser.builder()
+                        .id(UUID.randomUUID())
+                        .email(email)
+                        .password(password)
+                        .firstName("Andrew")
+                        .lastName("Smith")
+                        .manager(manager)
+                        .department(department)
+                        .title(title)
+                        .build();
+        }
+
+        private Department createDepartment(String name) {
+                return Department.builder()
+                        .id(UUID.randomUUID())
+                        .name(name)
+                        .build();
+        }
+
+        private Title createTitle(String name, boolean isManager) {
+                return Title.builder()
+                        .id(UUID.randomUUID())
+                        .name(name)
+                        .isManager(isManager)
+                        .build();
         }
 
         @Test
@@ -208,21 +205,13 @@ public class AuthServiceTests {
                                 exception.getMessage());
         }
 
-        // TODO
-        // public void logout_UserLoggedIn_ReturnsTrue(){
+        @Test
+        public void logout_ValidUserId_ExpiresJwt() {
+                boolean result = authService.logout(this.testUser.getId());
 
-        // }
+                assertTrue(result, "Logout should return true");
+                verify(jwtService, times(1)).expire(this.testUser.getId()); // Verify that expire was called once
 
-        // TODO 01: Review with youssef If we need a NULL one because it throws Does not
-        // exist , It passes the try catch in the Serivce ???
-        // TODO
-        // public void login_NullCredentials_ThrowsInvalidCredentialsException() {
-
-        // }
-        //
-        // TODO
-        // public void login_EmptyEmail_ThrowsInvalidCredentialsException() {
-
-        // }
+        }
 
 }

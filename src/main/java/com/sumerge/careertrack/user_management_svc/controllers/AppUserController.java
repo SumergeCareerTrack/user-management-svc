@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +25,19 @@ public class AppUserController {
 
     /* GET METHODS */
     @GetMapping("/")
-    public ResponseEntity<List<AppUserResponseDTO>> getAll() {
-        List<AppUserResponseDTO> users = userService.getAll();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<AppUserResponseDTO>> getAll(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+
+        if (page == null || size == null || size == 0) {
+            List<AppUserResponseDTO> allUsers = userService.getAll();
+            return ResponseEntity.ok(allUsers);
+        } else {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<AppUserResponseDTO> usersPage = userService.getAll(pageable);
+            List<AppUserResponseDTO> users = usersPage.getContent();
+            return ResponseEntity.ok(users);
+        }
     }
 
     @PostMapping("/batch")
@@ -45,7 +58,7 @@ public class AppUserController {
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/email/{email}") // TODO Review RequestBody vs PathVariable
+    @GetMapping("/email/{email}")
     public ResponseEntity<AppUserResponseDTO> getByEmail(@PathVariable String email) {
         AppUserResponseDTO user = userService.getByEmail(email);
         return ResponseEntity.ok(user);

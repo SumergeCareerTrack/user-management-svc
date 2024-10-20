@@ -1,7 +1,6 @@
 package com.sumerge.careertrack.user_management_svc.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sumerge.careertrack.user_management_svc.controllers.TitleController;
 import com.sumerge.careertrack.user_management_svc.exceptions.AlreadyExistsException;
 import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
 import com.sumerge.careertrack.user_management_svc.mappers.DepartmentRequestDTO;
@@ -52,6 +51,7 @@ class TitleControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
     @Test
     void getAllTitles_Successful() throws Exception {
         TitleResponseDTO titleResponseDTO = new TitleResponseDTO();
@@ -68,6 +68,7 @@ class TitleControllerTest {
         verify(titleService, times(1)).getAllTitles();
     }
 
+
     @Test
     void getAllTitles_Not_Successful() throws Exception {
         List<TitleResponseDTO> titles = new ArrayList<>();
@@ -77,6 +78,37 @@ class TitleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
         verify(titleService, times(1)).getAllTitles();
+    }
+
+    @Test
+    void getTitleById_Success() throws Exception {
+        UUID titleId = UUID.randomUUID();
+        TitleResponseDTO mockResponse = new TitleResponseDTO();
+        mockResponse.setId(titleId);
+        mockResponse.setName("Software Engineer");
+
+        when(titleService.getTitleById(titleId.toString())).thenReturn(mockResponse);
+
+        mockMvc.perform(get("/titles/title/{titleId}", titleId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(titleId.toString()))
+                .andExpect(jsonPath("$.name").value("Software Engineer"));
+        verify(titleService, times(1)).getTitleById(titleId.toString());
+    }
+
+    @Test
+    void getTitleById_NotFound() throws Exception {
+        String titleId = UUID.randomUUID().toString();
+
+        when(titleService.getTitleById(titleId))
+                .thenThrow( DoesNotExistException.class);
+
+        mockMvc.perform(get("/titles/title/{titleId}", titleId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        verify(titleService, times(1)).getTitleById(titleId);
     }
 
     @Test

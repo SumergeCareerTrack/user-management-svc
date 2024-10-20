@@ -9,10 +9,12 @@ import com.sumerge.careertrack.user_management_svc.repositories.DepartmentReposi
 import com.sumerge.careertrack.user_management_svc.repositories.TitleRepository;
 import com.sumerge.careertrack.user_management_svc.services.TitleService;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
@@ -39,6 +41,21 @@ class TitleServiceTest {
     @InjectMocks
     private TitleService titleService;
 
+
+    private String titleId;
+    private Title title;
+    private TitleResponseDTO titleResponseDTO;
+
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+        titleId = UUID.randomUUID().toString();
+        title = new Title();
+        titleResponseDTO = new TitleResponseDTO();
+    }
+
+
+
     @Test
     void getAllTitles_Successful() {
         Title title1 = new Title();
@@ -64,6 +81,34 @@ class TitleServiceTest {
         List<TitleResponseDTO> receivedTitles = titleService.getAllTitles();
         assertEquals(receivedTitles.size(), 0);
         verify(titleRepository, times(1)).findAll();
+    }
+    @Test
+    public void getTitleById_ValidId_ReturnsTitleResponseDTO() {
+
+        when(titleRepository.findById(UUID.fromString(titleId))).thenReturn(Optional.of(title));
+        when(titleMapper.toDTO(title)).thenReturn(titleResponseDTO);
+
+
+        TitleResponseDTO result = titleService.getTitleById(titleId);
+
+        assertNotNull(result, "Result should not be null");
+        assertEquals(titleResponseDTO, result, "Returned DTO should match expected DTO");
+        verify(titleRepository, times(1)).findById(UUID.fromString(titleId)); // Verify findById is called once
+        verify(titleMapper, times(1)).toDTO(title); // Verify toDTO is called once
+    }
+
+
+    @Test
+    public void getTitleById_InvalidId_ThrowsDoesNotExistException() {
+        when(titleRepository.findById(UUID.fromString(titleId))).thenReturn(Optional.empty());
+
+        DoesNotExistException exception = assertThrows(DoesNotExistException.class, () -> {
+            titleService.getTitleById(titleId);
+        });
+
+        assertEquals(String.format(DoesNotExistException.TITLE_BY_ID,titleId), exception.getMessage());
+        verify(titleRepository, times(1)).findById(UUID.fromString(titleId));
+        verify(titleMapper, never()).toDTO(any());
     }
 
     @Test

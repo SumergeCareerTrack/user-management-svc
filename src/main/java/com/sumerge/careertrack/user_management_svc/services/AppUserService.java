@@ -5,6 +5,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,10 @@ public class AppUserService {
     public List<AppUserResponseDTO> getAll() {
         List<AppUser> users = userRepository.findAll();
         return users.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
+    }
+    public Page<AppUserResponseDTO> getAll(Pageable pageable) {
+        Page<AppUser> usersPage = userRepository.findAll(pageable);
+        return usersPage.map(userMapper::toResponseDTO);
     }
 
     public List<AppUserResponseDTO> getBatch(List<UUID> ids) {
@@ -91,13 +97,13 @@ public class AppUserService {
         List<AppUser> users = userRepository.findByTitleName(titleName);
         return users.stream().map(userMapper::toResponseDTO).collect(Collectors.toList());
     }
-
+//TODO Remove or not ???
     public AppUserResponseDTO getManager(UUID userId) {
         AppUser user = userRepository.findById(userId)
                 .orElseThrow(() -> new DoesNotExistException(
                         DoesNotExistException.APP_USER_ID, userId));
 
-        AppUser userManager = user.getManager(); // TODO test if user has no manager
+        AppUser userManager = user.getManager();
         return userMapper.toResponseDTO(userManager);
     }
 
@@ -131,7 +137,7 @@ public class AppUserService {
         if (dto.getTitleId() != null) {
             Title title = titlesRepository.findById(dto.getTitleId())
                     .orElseThrow(() -> new DoesNotExistException(
-                            DoesNotExistException.TITLE, dto.getTitleId()));
+                            DoesNotExistException.TITLE, dto.getTitleId(),dto.getDepartmentId()));
             userObj.setTitle(title);
             userObj.setDepartment(title.getDepartment());
         }
@@ -159,7 +165,8 @@ public class AppUserService {
                         DoesNotExistException.APP_USER_ID, userId));
         userRepository.delete(user);
     }
-        //TODO DO ITS TESTS
+
+
     public AppUserResponseDTO changePassword(String password, String userId) {
         AppUser user = userRepository.findById(UUID.fromString(userId))
                 .orElseThrow(() -> new DoesNotExistException(

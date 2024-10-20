@@ -1,22 +1,23 @@
 package com.sumerge.careertrack.user_management_svc.controllers;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,6 +43,7 @@ import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistExcept
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserRequestDTO;
 import com.sumerge.careertrack.user_management_svc.mappers.AppUserResponseDTO;
 import com.sumerge.careertrack.user_management_svc.services.AppUserService;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -62,33 +65,41 @@ public class AppUserControllerTests {
         Title mockTitle;
         AppUserRequestDTO mockUserRequest;
         AppUserResponseDTO mockUserResponse;
+        private UUID existingUserId;
+        private UUID nonExistingUserId;
 
+        private AppUserRequestDTO createMockUserRequest(Department department, Title title) {
+                return AppUserRequestDTO.builder()
+                        .id(existingUserId)
+                        .email("email@sumerge.com")
+                        .firstName("FN")
+                        .lastName("LN")
+                        .departmentId(department.getId())
+                        .titleId(title.getId())
+                        .build();
+        }
+
+        private AppUserResponseDTO createMockUserResponse(AppUserRequestDTO userRequest, Department department, Title title) {
+                return AppUserResponseDTO.builder()
+                        .id(userRequest.getId())
+                        .email(userRequest.getEmail())
+                        .firstName(userRequest.getFirstName())
+                        .lastName(userRequest.getLastName())
+                        .department(department)
+                        .title(title)
+                        .build();
+        }
         @BeforeEach
         public void setup() {
-
+                existingUserId = UUID.randomUUID();
+                nonExistingUserId = UUID.randomUUID();
                 mockDept = new Department(UUID.randomUUID(), "SE");
 
                 mockTitle = new Title(UUID.randomUUID(), mockDept, "ASE", false);
 
-                mockUserRequest = AppUserRequestDTO.builder()
-                                .id(UUID.randomUUID())
-                                .email("email@sumerge.com")
-                                .firstName("FN")
-                                .lastName("LN")
-                                .departmentId(mockDept.getId())
-                                .titleId(mockTitle.getId())
-                                .build();
-
-                mockUserResponse = AppUserResponseDTO.builder()
-                                .id(mockUserRequest.getId())
-                                .email("email@sumerge.com")
-                                .firstName("FN")
-                                .lastName("LN")
-                                .department(mockDept)
-                                .title(mockTitle)
-                                .build();
+                mockUserRequest = createMockUserRequest(mockDept, mockTitle);
+                mockUserResponse = createMockUserResponse(mockUserRequest, mockDept, mockTitle);
         }
-
         @Test
         public void getAllUsers_NoUsers_ReturnEmpty() throws Exception {
                 when(appUserService.getAll()).thenReturn(Arrays.asList());
@@ -101,7 +112,6 @@ public class AppUserControllerTests {
 
                 verify(appUserService, times(1)).getAll();
         }
-
         @Test
         public void getAllUsers_Users_OK() throws Exception {
                 List<AppUserResponseDTO> responseList = Arrays.asList(mockUserResponse, mockUserResponse);
@@ -116,6 +126,36 @@ public class AppUserControllerTests {
                                                 objectMapper.writeValueAsString(responseList)));
 
                 verify(appUserService, times(1)).getAll();
+        }
+
+        @Test
+        public void getBatch_ValidIds_ReturnsUserResponses() throws Exception {
+
+                List<UUID> ids = List.of(existingUserId);
+                when(appUserService.getBatch(ids)).thenReturn(List.of(mockUserResponse));
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/users/batch")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(ids)))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$[0].id").value(existingUserId.toString()))
+                        .andExpect(jsonPath("$[0].email").value("email@sumerge.com"))
+                        .andExpect(jsonPath("$[0].firstName").value("FN"))
+                        .andExpect(jsonPath("$[0].lastName").value("LN"));
+
+
+        }
+        @Test
+        public void getBatch_EmptyIds_ReturnsEmptyList() throws Exception {
+                when(appUserService.getBatch(anyList())).thenReturn(Collections.emptyList());
+
+                mockMvc.perform(MockMvcRequestBuilders.post("/users/batch")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(Collections.emptyList().toString()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$").isEmpty());
         }
 
         @Test

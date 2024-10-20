@@ -6,6 +6,7 @@ public class DoesNotExistException extends UserManagementException {
     public static final String APP_USER_EMAIL = "User with email \"%s\" does not exist.";
     public static final String DEPARTMENT = "Department \"%s\" does not exist.";
     public static final String TITLE = "Title \"%s\" in department \"%s\" does not exist.";
+    public static final String TITLE_BY_ID = "Title with ID \"%s\" does not exist.";
 
     public DoesNotExistException() {
         super();
