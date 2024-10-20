@@ -75,42 +75,43 @@ public class AuthServiceTests {
                 this.testUser = createUser("test@test.com", "password", titleEmployee, department, managerUser);
 
                 this.registerRequest = new RegisterRequest(
-                        testUser.getEmail(),
-                        testUser.getPassword(),
-                        testUser.getFirstName(),
-                        testUser.getLastName(),
-                        testUser.getDepartment().getId(),
-                        testUser.getTitle().getId(),
-                        testUser.getManager() != null ? testUser.getManager().getId() : null // Handle null manager
+                                testUser.getEmail(),
+                                testUser.getPassword(),
+                                testUser.getFirstName(),
+                                testUser.getLastName(),
+                                testUser.getDepartment().getId(),
+                                testUser.getTitle().getId(),
+                                testUser.getManager() != null ? testUser.getManager().getId() : null // Handle null
+                                                                                                     // manager
                 );
         }
 
         private AppUser createUser(String email, String password, Title title, Department department, AppUser manager) {
                 return AppUser.builder()
-                        .id(UUID.randomUUID())
-                        .email(email)
-                        .password(password)
-                        .firstName("Andrew")
-                        .lastName("Smith")
-                        .manager(manager)
-                        .department(department)
-                        .title(title)
-                        .build();
+                                .id(UUID.randomUUID())
+                                .email(email)
+                                .password(password)
+                                .firstName("Andrew")
+                                .lastName("Smith")
+                                .manager(manager)
+                                .department(department)
+                                .title(title)
+                                .build();
         }
 
         private Department createDepartment(String name) {
                 return Department.builder()
-                        .id(UUID.randomUUID())
-                        .name(name)
-                        .build();
+                                .id(UUID.randomUUID())
+                                .name(name)
+                                .build();
         }
 
         private Title createTitle(String name, boolean isManager) {
                 return Title.builder()
-                        .id(UUID.randomUUID())
-                        .name(name)
-                        .isManager(isManager)
-                        .build();
+                                .id(UUID.randomUUID())
+                                .name(name)
+                                .isManager(isManager)
+                                .build();
         }
 
         @Test
@@ -210,7 +211,7 @@ public class AuthServiceTests {
                 boolean result = authService.logout(this.testUser.getId());
 
                 assertTrue(result, "Logout should return true");
-                verify(jwtService, times(1)).expire(this.testUser.getId()); // Verify that expire was called once
+                verify(jwtService, times(1)).expire(this.testUser.getEmail()); // Verify that expire was called once
 
         }
 

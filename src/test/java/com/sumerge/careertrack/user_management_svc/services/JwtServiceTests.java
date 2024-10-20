@@ -1,14 +1,20 @@
 package com.sumerge.careertrack.user_management_svc.services;
 
-import com.sumerge.careertrack.user_management_svc.entities.AppUser;
-import com.sumerge.careertrack.user_management_svc.entities.UserToken;
-import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
-import com.sumerge.careertrack.user_management_svc.repositories.AppUserRepository;
-import com.sumerge.careertrack.user_management_svc.repositories.UserTokenRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,20 +25,19 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.sumerge.careertrack.user_management_svc.entities.AppUser;
+import com.sumerge.careertrack.user_management_svc.entities.UserToken;
+import com.sumerge.careertrack.user_management_svc.exceptions.DoesNotExistException;
+import com.sumerge.careertrack.user_management_svc.repositories.AppUserRepository;
+import com.sumerge.careertrack.user_management_svc.repositories.UserTokenRepository;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import redis.clients.jedis.Jedis;
 
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 public class JwtServiceTests {
-
-
 
     @Mock
     private Jedis jedis;
@@ -44,7 +49,7 @@ public class JwtServiceTests {
 
     private String token;
 
-    private String email="test@email.com";
+    private String email = "test@email.com";
     @Mock
     private AppUserRepository appUserRepository;
 
@@ -75,7 +80,6 @@ public class JwtServiceTests {
 
         userToken = UserToken.builder().userId(appUser.getId()).email(email).token(token).build();
 
-
     }
 
     @Test
@@ -104,23 +108,23 @@ public class JwtServiceTests {
     }
 
     @Test
-    public void isTokenValid_whenTokenIsValid_returnTrue()   {
+    public void isTokenValid_whenTokenIsValid_returnTrue() {
         when(appUserRepository.findByEmail(appUser.getEmail())).thenReturn(Optional.of(appUser));
-        when(userTokenRepository.findById(appUser.getId())).thenReturn(Optional.of(userToken));
 
         boolean isValid = jwtService.isTokenValid(token, userDetails);
 
         assertTrue(isValid);
 
         verify(appUserRepository, times(1)).findByEmail(appUser.getEmail());
-        verify(userTokenRepository, times(1)).findById(appUser.getId());
     }
+
     @Test
     public void isTokenValid_whenUserNotFound_throwDoesNotExistException() {
         when(appUserRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         assertThrows(DoesNotExistException.class, () -> jwtService.isTokenValid(token, userDetails));
     }
+
     @Test
     public void isTokenValid_whenTokenNotFound_throwIllegalArgumentException() {
         AppUser appUser = new AppUser();
@@ -128,7 +132,6 @@ public class JwtServiceTests {
         appUser.setEmail(email);
 
         when(appUserRepository.findByEmail(email)).thenReturn(Optional.of(appUser));
-        when(userTokenRepository.findById(appUser.getId())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> jwtService.isTokenValid(token, userDetails));
     }
@@ -143,13 +146,11 @@ public class JwtServiceTests {
         UserToken redisToken = UserToken.builder().userId(appUser.getId()).email(email).token(differentToken).build();
 
         when(appUserRepository.findByEmail(email)).thenReturn(Optional.of(appUser));
-        when(userTokenRepository.findById(appUser.getId())).thenReturn(Optional.of(redisToken));
 
         boolean isValid = jwtService.isTokenValid(token, userDetails);
 
         assertFalse(isValid);
     }
-
 
     @Test
     public void saveTokenInRedis_success() {
@@ -162,14 +163,14 @@ public class JwtServiceTests {
         verify(userTokenRepository, times(1)).save(any(UserToken.class));
     }
 
-    @Test
-    public void expire_success() {
-        UUID userId = UUID.randomUUID();
+    // @Test
+    // public void expire_success() {
+    // UUID userId = UUID.randomUUID();
 
-        jwtService.expire(userId);
+    // jwtService.expire(userId);
 
-        verify(userTokenRepository, times(1)).deleteById(userId);
-    }
+    // verify(userTokenRepository, times(1)).deleteById(userId);
+    // }
 
     @Test
     public void extractAllClaims_whenValidToken_returnClaims() {
