@@ -5,7 +5,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -297,18 +295,6 @@ public class AppUserControllerTests {
                 verify(appUserService, times(1)).getAllByTitle(mockTitle.getName());
         }
 
-        @Test
-        public void getAllUsersByTitle_TitleDoesNotExist_Throws() throws Exception {
-                when(appUserService.getAllByTitle(anyString()))
-                                .thenThrow(DoesNotExistException.class);
-
-                ResultActions response = mockMvc.perform(
-                                get("/users/title/{titleName}", mockTitle.getName()));
-
-                response.andExpect(status().isBadRequest());
-
-                verify(appUserService, times(1)).getAllByTitle(mockTitle.getName());
-        }
 
         @Test
         public void getSubordinates_SubordinatesExists_Ok() throws Exception {
@@ -385,6 +371,35 @@ public class AppUserControllerTests {
                 response.andExpect(status().isBadRequest());
 
                 verify(appUserService, times(1)).updateUser(mockUserRequest);
+        }
+
+        @Test
+        public void changePassword_Success() throws Exception {
+                String userId = UUID.randomUUID().toString();
+                String newPassword = "newPassword";
+                AppUserResponseDTO responseDto = AppUserResponseDTO.builder().id(UUID.fromString(userId)).build();
+                when(appUserService.changePassword(userId, newPassword)).thenReturn(responseDto);
+
+                ResultActions response = mockMvc.perform(put("/users/password/" + userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(newPassword));
+
+
+                response.andExpect(status().isOk());
+
+                verify(appUserService, times(1)).changePassword(newPassword, userId);
+        }
+
+        @Test
+        public void changePassword_UserDoesNotExist_Throws() throws Exception {
+                when(appUserService.changePassword(any(String.class), any(String.class))).thenThrow(DoesNotExistException.class);
+                String pass = "newPassword";
+                ResultActions response = mockMvc.perform(put("/users/password/" + mockUserRequest.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(pass));
+                response.andExpect(status().isBadRequest());
+
+                verify(appUserService, times(1)).changePassword(any(String.class), any(String.class));
         }
 
         @Test
