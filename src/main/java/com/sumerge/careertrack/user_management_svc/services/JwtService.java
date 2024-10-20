@@ -52,7 +52,7 @@ public class JwtService {
 
         AppUser appUser = appUserRepository.findByEmail(email)
                 .orElseThrow(() -> new DoesNotExistException(DoesNotExistException.APP_USER_EMAIL, email));
-        UserToken redisToken = userTokenRepository.findById(appUser.getId())
+        UserToken redisToken = userTokenRepository.findById(appUser.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("No token found for the provided email: " + email));
 
         return (email.equals(userDetails.getUsername())
@@ -118,8 +118,8 @@ public class JwtService {
         return userTokenRepository.existsByEmail(email);
     }
 
-    public void expire(UUID userId) {
-        userTokenRepository.deleteById(userId);
+    public void expire(String email) {
+        userTokenRepository.deleteById(email);
     }
 
     // public boolean setExpiryDate(String email, long seconds) {

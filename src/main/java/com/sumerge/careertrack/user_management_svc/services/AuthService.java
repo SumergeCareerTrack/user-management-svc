@@ -91,7 +91,11 @@ public class AuthService {
 	}
 
 	public boolean logout(UUID userId) {
-		jwtService.expire(userId);
+		AppUser user = appUserRepository.findById(userId)
+				.orElseThrow(() -> new DoesNotExistException(
+						DoesNotExistException.APP_USER_ID, userId));
+
+		jwtService.expire(user.getEmail());
 		return true;
 	}
 

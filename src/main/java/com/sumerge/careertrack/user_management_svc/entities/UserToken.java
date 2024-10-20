@@ -15,9 +15,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class UserToken {
     @Id
-    UUID userId;
-
     String email;
+
+    UUID userId;
 
     String token;
 }
