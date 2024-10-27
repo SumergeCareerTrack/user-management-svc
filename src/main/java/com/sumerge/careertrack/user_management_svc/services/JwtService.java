@@ -123,20 +123,4 @@ public class JwtService {
         userTokenRepository.deleteById(email);
     }
 
-    // public boolean setExpiryDate(String email, long seconds) {
-    // try {
-    // String tokenData = jedis.get(email);
-    // if (tokenData != null) {
-    // jedis.expire(email, seconds);
-    // return true;
-    // } else {
-    // throw new IllegalArgumentException("No token found for the provided email: "
-    // + email);
-    // }
-    // } catch (Exception e) {
-    // throw new IllegalArgumentException("No token found for the provided email: "
-    // + email);
-    // }
-
-    // }
 }
