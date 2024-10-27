@@ -65,7 +65,7 @@ public class AppUserServiceTests {
     void setUp() {
         MockitoAnnotations.initMocks(this);
 
-        // Initialize common objects
+
         mockUser = new AppUser();
         mockUser.setId(UUID.randomUUID());
         mockUser.setEmail("test@example.com");
@@ -317,7 +317,7 @@ public class AppUserServiceTests {
     }
     @Test
     void updateUser_Successful() {
-        UUID userId = UUID.randomUUID();  // This should be the same across mocks
+        UUID userId = UUID.randomUUID();  
         UUID managerId = UUID.randomUUID();
         UUID titleId = UUID.randomUUID();
 
@@ -333,17 +333,16 @@ public class AppUserServiceTests {
         mockUserRequestDTO.setManagerId(managerId);
         mockUserRequestDTO.setTitleId(titleId);
 
-        // Stubbing the repository calls
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser)); // This is key
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser)); 
         when(userRepository.findById(managerId)).thenReturn(Optional.of(manager));
         when(titleRepository.findById(titleId)).thenReturn(Optional.of(mockTitle));
         when(userRepository.save(mockUser)).thenReturn(mockUser);
         when(userMapper.toResponseDTO(mockUser)).thenReturn(mockUserResponseDTO);
 
-        // Calling the method under test
+
         AppUserResponseDTO result = userService.updateUser(mockUserRequestDTO);
 
-        // Assertions
+
         assertNotNull(result);
         verify(userRepository).findById(userId);
         verify(userRepository).findById(managerId);
