@@ -83,7 +83,6 @@ public class TitleControllerIntegrationTests {
         departmentRepository.delete(savedDepartment);
     }
 
-    /* Test cases */
 
     @Test
     public void getAllTitles_Successful() throws Exception {
@@ -102,7 +101,6 @@ public class TitleControllerIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
-                //Returns 1 because we have a manual entry inside if not it will be 0 and an empty list
                 .andExpect(jsonPath("$.length()").value(1))
                 .andReturn();
     }
@@ -144,7 +142,6 @@ public class TitleControllerIntegrationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
-                //Returns 1 because we have a manual entry inside if not it will be 0 and an empty list
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
