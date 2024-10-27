@@ -163,15 +163,6 @@ public class JwtServiceTests {
         verify(userTokenRepository, times(1)).save(any(UserToken.class));
     }
 
-    // @Test
-    // public void expire_success() {
-    // UUID userId = UUID.randomUUID();
-
-    // jwtService.expire(userId);
-
-    // verify(userTokenRepository, times(1)).deleteById(userId);
-    // }
-
     @Test
     public void extractAllClaims_whenValidToken_returnClaims() {
         Claims claims = jwtService.extractAllClaims(token);
