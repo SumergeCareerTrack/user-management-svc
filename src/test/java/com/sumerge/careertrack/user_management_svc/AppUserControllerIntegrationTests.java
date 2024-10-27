@@ -208,7 +208,7 @@ public class AppUserControllerIntegrationTests {
                         .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(2))  // Expecting two users in the response
+                .andExpect(jsonPath("$.length()").value(2))  
                 .andExpect(jsonPath("$[0].email").value(savedUser1.getEmail()))
                 .andExpect(jsonPath("$[1].email").value(savedUser2.getEmail()));
         appUserRepository.delete(savedUser1);
@@ -224,7 +224,7 @@ public class AppUserControllerIntegrationTests {
                         .header("Authorization", "Bearer " + jwtToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.length()").value(0)); // Expecting an empty list
+                .andExpect(jsonPath("$.length()").value(0)); 
     }
     @Test
     public void getSubordinates_Success() throws Exception {
