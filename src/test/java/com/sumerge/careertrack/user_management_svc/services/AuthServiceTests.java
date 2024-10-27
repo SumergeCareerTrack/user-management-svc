@@ -81,8 +81,8 @@ public class AuthServiceTests {
                                 testUser.getLastName(),
                                 testUser.getDepartment().getId(),
                                 testUser.getTitle().getId(),
-                                testUser.getManager() != null ? testUser.getManager().getId() : null // Handle null
-                                                                                                     // manager
+                                testUser.getManager() != null ? testUser.getManager().getId() : null 
+                                                                                                     
                 );
         }
 
@@ -134,7 +134,7 @@ public class AuthServiceTests {
         @Test
         public void register_whenUserExists_ThrowsAlreadyExistsException() {
 
-                System.out.println(this.registerRequest.getEmail()); // Print the email to verify it's what you expect
+                System.out.println(this.registerRequest.getEmail()); 
 
                 when(appUserRepository.existsByEmail(any())).thenReturn(true);
                 assertThrows(AlreadyExistsException.class, () -> authService.register(this.registerRequest));
@@ -211,7 +211,7 @@ public class AuthServiceTests {
                 boolean result = authService.logout(this.testUser.getId());
 
                 assertTrue(result, "Logout should return true");
-                verify(jwtService, times(1)).expire(this.testUser.getEmail()); // Verify that expire was called once
+                verify(jwtService, times(1)).expire(this.testUser.getEmail()); 
 
         }
 
