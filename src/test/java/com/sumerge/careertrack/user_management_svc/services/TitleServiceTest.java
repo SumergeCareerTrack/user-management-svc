@@ -93,8 +93,8 @@ class TitleServiceTest {
 
         assertNotNull(result, "Result should not be null");
         assertEquals(titleResponseDTO, result, "Returned DTO should match expected DTO");
-        verify(titleRepository, times(1)).findById(UUID.fromString(titleId)); // Verify findById is called once
-        verify(titleMapper, times(1)).toDTO(title); // Verify toDTO is called once
+        verify(titleRepository, times(1)).findById(UUID.fromString(titleId)); 
+        verify(titleMapper, times(1)).toDTO(title); 
     }
 
 
@@ -199,7 +199,7 @@ class TitleServiceTest {
         TitleResponseDTO responseDTO = new TitleResponseDTO();
         responseDTO.setName("New Title");
 
-        // Mock behavior
+       
         when(titleMapper.toTitle(requestDTO)).thenReturn(title);
         when(departmentRepository.findById(requestDTO.getDepartmentId())).thenReturn(Optional.of(department));
         when(titleRepository.existsByNameAndDepartmentName(requestDTO.getName(), department.getName()))
