@@ -111,7 +111,7 @@ public class JwtService {
         UserToken userToken = UserToken.builder().userId(userId).email(email).token(token).build();
 
         userTokenRepository.save(userToken);
-        // jedis.set(email, json.toString());
+
     }
 
     public boolean isTokenInRedis(String email) {
