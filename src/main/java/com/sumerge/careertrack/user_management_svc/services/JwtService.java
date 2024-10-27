@@ -95,7 +95,7 @@ public class JwtService {
                 .getBody();
     }
 
-    Key getSignInKey() { // TODO 1: Understand this method
+    Key getSignInKey() { 
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
 
